@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     name            VARCHAR(255) NOT NULL,
     email           VARCHAR(255) NOT NULL,
     birth_date      TIMESTAMP,
+    reg_date        TIMESTAMP,
 
     CONSTRAINT      pk_user PRIMARY KEY (id),
 
@@ -18,9 +19,10 @@ CREATE TABLE IF NOT EXISTS vehicles (
 
     owner_id        BIGINT NOT NULL, -- fk
 
-    name            VARCHAR(255) NOT NULL,
-    producer        VARCHAR(255),
-    model           VARCHAR(255),
+    producer        VARCHAR(255) NOT NULL,
+    model           VARCHAR(255) NOT NULL,
+    name            VARCHAR(255),
+    color           VARCHAR(255),
     release_date    TIMESTAMP,
     engine_volume   DEC,
     fuel_type       VARCHAR(255),
