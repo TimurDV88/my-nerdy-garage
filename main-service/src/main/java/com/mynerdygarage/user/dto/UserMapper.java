@@ -2,6 +2,7 @@ package com.mynerdygarage.user.dto;
 
 
 import com.mynerdygarage.user.model.User;
+import com.mynerdygarage.util.CustomFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +15,8 @@ public class UserMapper {
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
-                String.valueOf(user.getBirthDate()),
-                user.getRegDate()
+                CustomFormatter.dateToString(user.getBirthDate()),
+                CustomFormatter.dateTimeToString(user.getRegDate())
         );
     }
 

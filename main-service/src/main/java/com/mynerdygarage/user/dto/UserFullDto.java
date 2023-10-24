@@ -2,8 +2,6 @@ package com.mynerdygarage.user.dto;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 @Data
 public class UserFullDto {
 
@@ -15,5 +13,5 @@ public class UserFullDto {
 
     private final String birthDate;
 
-    private final LocalDateTime regDate;
+    private final String regDate;
 }

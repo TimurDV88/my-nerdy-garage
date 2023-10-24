@@ -1,11 +1,11 @@
 package com.mynerdygarage.vehicle.model;
 
-import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity

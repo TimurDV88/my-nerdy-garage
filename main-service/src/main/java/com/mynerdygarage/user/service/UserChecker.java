@@ -10,22 +10,22 @@ import java.time.LocalDate;
 
 public class UserChecker {
 
-    public static boolean isNotCorrect(UserRepository userRepository, UserFullDto user) {
+    public static boolean isNotCorrect(UserRepository userRepository, UserFullDto userDto) {
 
-        if (user.getEmail() != null && userRepository.existsByEmail(user.getEmail())) {
-            throw new ConflictOnRequestException("- User with this Email already exists");
+        if (userDto.getEmail() != null && userRepository.existsByEmail(userDto.getEmail())) {
+            throw new ConflictOnRequestException("- User with this Email already exists: " + userDto.getEmail());
         }
 
-        if (user.getName() != null && userRepository.existsByName(user.getName())) {
-            throw new ConflictOnRequestException("- User with this Name already exists");
+        if (userDto.getName() != null && userRepository.existsByName(userDto.getName())) {
+            throw new ConflictOnRequestException("- User with this Name already exists: " + userDto.getName());
         }
 
-        LocalDate birthDate = CustomFormatter.stringToDate(user.getBirthDate());
+        LocalDate birthDate = CustomFormatter.stringToDate(userDto.getBirthDate());
 
-        if (birthDate.isAfter(LocalDate.now())) {
+        if (birthDate != null && birthDate.isAfter(LocalDate.now())) {
             throw new IncorrectRequestException("- Birth date must be before current time");
         }
 
-        return true;
+        return false;
     }
 }
