@@ -2,8 +2,6 @@ package com.mynerdygarage.vehicle.service;
 
 import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.repository.UserRepository;
-import com.mynerdygarage.util.CustomFormatter;
-import com.mynerdygarage.util.NullChecker;
 import com.mynerdygarage.util.PageRequestCreator;
 import com.mynerdygarage.vehicle.dto.NewVehicleDto;
 import com.mynerdygarage.vehicle.dto.VehicleFullDto;
@@ -39,12 +37,9 @@ public class VehicleServiceImpl implements VehicleService {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
         }
 
-        Vehicle vehicle = VehicleCreator.create(newVehicleDto);
+        Vehicle vehicle = VehicleCreator.create(ownerId, newVehicleDto);
 
-        if (VehicleChecker.isNotCorrect(vehicleRepository, VehicleMapper.vehicleToFullDto(vehicle))) {
-            log.info("-- Vehicle has NOT been saved: {}", newVehicleDto);
-            return null;
-        }
+        VehicleChecker.isCorrect(vehicleRepository, ownerId, VehicleMapper.vehicleToFullDto(vehicle));
 
         VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicle));
 
@@ -63,25 +58,7 @@ public class VehicleServiceImpl implements VehicleService {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
         }
 
-        if (VehicleChecker.isNotCorrect(vehicleRepository, inputVehicleDto)) {
-            log.info("-- Vehicle with vehicleId={} has NOT been updated", vehicleId);
-            return null;
-        }
-
-        Vehicle vehicle = vehicleRepository.findById(vehicleId).orElseThrow(() ->
-                new NotFoundException("- VehicleId not found: " + vehicleId));
-
-        NullChecker.setIfNotNull(vehicle::setProducer, inputVehicleDto.getProducer());
-        NullChecker.setIfNotNull(vehicle::setModel, inputVehicleDto.getModel());
-        NullChecker.setIfNotNull(vehicle::setName, inputVehicleDto.getName());
-        NullChecker.setIfNotNull(vehicle::setReleaseDate,
-                CustomFormatter.stringToDate(inputVehicleDto.getReleaseDate()));
-        NullChecker.setIfNotNull(vehicle::setEngineVolume, inputVehicleDto.getEngineVolume());
-        NullChecker.setIfNotNull(vehicle::setFuelType, String.valueOf(inputVehicleDto.getFuelType()));
-        NullChecker.setIfNotNull(vehicle::setPower, inputVehicleDto.getPower());
-        NullChecker.setIfNotNull(vehicle::setDescription, inputVehicleDto.getDescription());
-
-        VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicle));
+        VehicleFullDto fullDtoToReturn = VehicleUpdater.update(vehicleRepository, ownerId, vehicleId, inputVehicleDto);
 
         log.info("-- Vehicle has been updated: {}", fullDtoToReturn);
 
@@ -141,7 +118,7 @@ public class VehicleServiceImpl implements VehicleService {
 
         VehicleFullDto dtoToShowInLog = VehicleMapper.vehicleToFullDto(vehicleToCheck);
 
-        userRepository.deleteById(vehicleId);
+        vehicleRepository.deleteById(vehicleId);
 
         log.info("--- Vehicle deleted: {}", dtoToShowInLog);
     }

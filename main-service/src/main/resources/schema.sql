@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS vehicles (
     model           VARCHAR(255) NOT NULL,
     name            VARCHAR(255),
     color           VARCHAR(255),
+    reg_number      VARCHAR(255),
     release_date    TIMESTAMP,
     engine_volume   DEC,
     fuel_type       VARCHAR(255),

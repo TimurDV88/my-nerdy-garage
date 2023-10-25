@@ -6,11 +6,11 @@ import com.mynerdygarage.vehicle.model.Vehicle;
 
 public class VehicleCreator {
 
-    public static Vehicle create(NewVehicleDto newVehicleDto) {
+    public static Vehicle create(Long ownerId, NewVehicleDto newVehicleDto) {
 
         Vehicle vehicle = new Vehicle();
 
-        vehicle.setOwnerId(newVehicleDto.getOwnerId());
+        vehicle.setOwnerId(ownerId);
         vehicle.setProducer(newVehicleDto.getProducer());
         vehicle.setModel(newVehicleDto.getModel());
 
@@ -23,9 +23,18 @@ public class VehicleCreator {
         vehicle.setName(name);
 
         vehicle.setColor(newVehicleDto.getColor());
+        vehicle.setRegNumber(newVehicleDto.getRegNumber());
         vehicle.setReleaseDate(CustomFormatter.stringToDate(newVehicleDto.getReleaseDate()));
         vehicle.setEngineVolume(newVehicleDto.getEngineVolume());
-        vehicle.setFuelType(newVehicleDto.getFuelType().toString());
+
+        String fuelType;
+        if (newVehicleDto.getFuelType() == null) {
+            fuelType = null;
+        } else {
+            fuelType = newVehicleDto.getFuelType().toString();
+        }
+        vehicle.setFuelType(fuelType);
+
         vehicle.setPower(newVehicleDto.getPower());
         vehicle.setDescription(newVehicleDto.getDescription());
 

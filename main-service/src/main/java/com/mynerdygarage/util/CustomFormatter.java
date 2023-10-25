@@ -27,7 +27,11 @@ public class CustomFormatter {
 
     public static String dateToString(LocalDate date) {
 
-        return date.format(DATE_FORMATTER);
+        if (date != null) {
+            return date.format(DATE_FORMATTER);
+        } else {
+            return null;
+        }
     }
 
     public static LocalDateTime stringToDateTime(String dateString) {

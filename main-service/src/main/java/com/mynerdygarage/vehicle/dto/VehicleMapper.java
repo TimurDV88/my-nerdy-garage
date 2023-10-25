@@ -1,6 +1,6 @@
 package com.mynerdygarage.vehicle.dto;
 
-import com.mynerdygarage.vehicle.model.FuelType;
+import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.vehicle.model.Vehicle;
 
 import java.util.ArrayList;
@@ -13,13 +13,14 @@ public class VehicleMapper {
         return new VehicleFullDto(
                 vehicle.getId(),
                 vehicle.getOwnerId(),
-                vehicle.getName(),
                 vehicle.getProducer(),
                 vehicle.getModel(),
+                vehicle.getName(),
                 vehicle.getColor(),
-                String.valueOf(vehicle.getReleaseDate()),
+                vehicle.getRegNumber(),
+                CustomFormatter.dateToString(vehicle.getReleaseDate()),
                 vehicle.getEngineVolume(),
-                FuelType.valueOf(vehicle.getFuelType()),
+                vehicle.getFuelType(),
                 vehicle.getPower(),
                 vehicle.getDescription()
         );
@@ -42,7 +43,7 @@ public class VehicleMapper {
                 vehicle.getId(),
                 vehicle.getOwnerId(),
                 vehicle.getName(),
-                String.valueOf(vehicle.getReleaseDate())
+                CustomFormatter.dateToString(vehicle.getReleaseDate())
         );
     }
 

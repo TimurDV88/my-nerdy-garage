@@ -6,8 +6,6 @@ import com.mynerdygarage.user.dto.UserFullDto;
 import com.mynerdygarage.user.dto.UserMapper;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
-import com.mynerdygarage.util.CustomFormatter;
-import com.mynerdygarage.util.NullChecker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,10 +26,7 @@ public class UserServiceImpl implements UserService {
 
         User user = UserCreator.create(newUserDto);
 
-        if (UserChecker.isNotCorrect(userRepository, UserMapper.userToFullDto(user))) {
-            log.info("-- User has NOT been saved: {}", newUserDto);
-            return null;
-        }
+        UserChecker.isCorrect(userRepository, UserMapper.userToFullDto(user));
 
         UserFullDto fullDtoToReturn = UserMapper.userToFullDto(userRepository.save(user));
 
@@ -46,19 +41,7 @@ public class UserServiceImpl implements UserService {
 
         log.info("-- Updating user by userId={}: {}", userId, inputFullUserDto);
 
-        if (UserChecker.isNotCorrect(userRepository, inputFullUserDto)) {
-            log.info("-- User with userId={} has NOT been updated", userId);
-            return null;
-        }
-
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("- UserId not found: " + userId));
-
-        NullChecker.setIfNotNull(user::setName, inputFullUserDto.getName());
-        NullChecker.setIfNotNull(user::setEmail, inputFullUserDto.getEmail());
-        NullChecker.setIfNotNull(user::setBirthDate, CustomFormatter.stringToDate(inputFullUserDto.getBirthDate()));
-
-        UserFullDto fullDtoToReturn = UserMapper.userToFullDto(userRepository.save(user));
+        UserFullDto fullDtoToReturn = UserUpdater.update(userRepository, userId, inputFullUserDto);
 
         log.info("-- User has been updated: {}", fullDtoToReturn);
 

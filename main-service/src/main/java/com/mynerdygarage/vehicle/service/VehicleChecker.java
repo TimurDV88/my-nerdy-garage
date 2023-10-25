@@ -10,18 +10,16 @@ import java.time.LocalDate;
 
 public class VehicleChecker {
 
-    public static boolean isNotCorrect(VehicleRepository vehicleRepository, VehicleFullDto vehicle) {
+    public static void isCorrect(VehicleRepository vehicleRepository, Long ownerId, VehicleFullDto vehicleDto) {
 
-        if (vehicleRepository.existsByOwnerIdAndName(vehicle.getOwnerId(), vehicle.getName())) {
+        if (vehicleRepository.existsByOwnerIdAndName(ownerId, vehicleDto.getName())) {
             throw new ConflictOnRequestException("- Vehicle with this Name already exists in garage of this user");
         }
 
-        LocalDate releaseDate = CustomFormatter.stringToDate(vehicle.getReleaseDate());
+        LocalDate releaseDate = CustomFormatter.stringToDate(vehicleDto.getReleaseDate());
 
-        if (releaseDate.isAfter(LocalDate.now())) {
+        if (releaseDate != null && releaseDate.isAfter(LocalDate.now())) {
             throw new IncorrectRequestException("- Release date must be before current time");
         }
-
-        return true;
     }
 }

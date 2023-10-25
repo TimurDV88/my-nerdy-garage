@@ -35,6 +35,9 @@ public class Vehicle {
     @Column(name = "color")
     private String color;
 
+    @Column(name = "reg_number")
+    private String regNumber;
+
     @Column(name = "release_date")
     private LocalDate releaseDate;
 

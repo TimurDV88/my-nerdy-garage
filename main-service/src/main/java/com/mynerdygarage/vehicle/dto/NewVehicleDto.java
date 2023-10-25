@@ -12,10 +12,6 @@ public class NewVehicleDto {
 
     @NotNull
     @NotBlank
-    private final Long ownerId;
-
-    @NotNull
-    @NotBlank
     @Size(min = 2, message = "size must be between 2 and 20")
     @Size(max = 20, message = "size must be between 2 and 20")
     private final String producer;
@@ -33,6 +29,10 @@ public class NewVehicleDto {
     @Size(min = 2, message = "size must be between 2 and 20")
     @Size(max = 20, message = "size must be between 2 and 20")
     private final String color;
+
+    @Size(min = 2, message = "size must be between 2 and 20")
+    @Size(max = 20, message = "size must be between 2 and 20")
+    private final String regNumber;
 
     @Size(min = 12, message = "size must be between 12 and 13")
     @Size(max = 13, message = "size must be between 12 and 13")

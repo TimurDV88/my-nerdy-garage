@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public class UserChecker {
 
-    public static boolean isNotCorrect(UserRepository userRepository, UserFullDto userDto) {
+    public static void isCorrect(UserRepository userRepository, UserFullDto userDto) {
 
         if (userDto.getEmail() != null && userRepository.existsByEmail(userDto.getEmail())) {
             throw new ConflictOnRequestException("- User with this Email already exists: " + userDto.getEmail());
@@ -25,7 +25,5 @@ public class UserChecker {
         if (birthDate != null && birthDate.isAfter(LocalDate.now())) {
             throw new IncorrectRequestException("- Birth date must be before current time");
         }
-
-        return false;
     }
 }
