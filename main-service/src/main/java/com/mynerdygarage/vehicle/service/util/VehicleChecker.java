@@ -1,4 +1,4 @@
-package com.mynerdygarage.vehicle.service;
+package com.mynerdygarage.vehicle.service.util;
 
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.IncorrectRequestException;
@@ -10,9 +10,9 @@ import java.time.LocalDate;
 
 public class VehicleChecker {
 
-    public static void isCorrect(VehicleRepository vehicleRepository, Long ownerId, VehicleFullDto vehicleDto) {
+    public static void check(VehicleRepository vehicleRepository, Long ownerId, VehicleFullDto vehicleDto) {
 
-        if (vehicleRepository.existsByOwnerIdAndName(ownerId, vehicleDto.getName())) {
+        if (vehicleRepository.existsByOwnerIdAndNameIgnoreCase(ownerId, vehicleDto.getName())) {
             throw new ConflictOnRequestException("- Vehicle with this Name already exists in garage of this user");
         }
 

@@ -1,6 +1,7 @@
 package com.mynerdygarage.vehicle.service;
 
 import com.mynerdygarage.error.exception.NotFoundException;
+import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.util.PageRequestCreator;
 import com.mynerdygarage.vehicle.dto.NewVehicleDto;
@@ -9,6 +10,9 @@ import com.mynerdygarage.vehicle.dto.VehicleMapper;
 import com.mynerdygarage.vehicle.dto.VehicleShortDto;
 import com.mynerdygarage.vehicle.model.Vehicle;
 import com.mynerdygarage.vehicle.repository.VehicleRepository;
+import com.mynerdygarage.vehicle.service.util.VehicleChecker;
+import com.mynerdygarage.vehicle.service.util.VehicleCreator;
+import com.mynerdygarage.vehicle.service.util.VehicleUpdater;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -33,13 +37,12 @@ public class VehicleServiceImpl implements VehicleService {
 
         log.info("-- Saving vehicle by user with Id={}: {}", ownerId, newVehicleDto);
 
-        if (!userRepository.existsById(ownerId)) {
-            throw new NotFoundException("- OwnerId not found: " + ownerId);
-        }
+        User owner = userRepository.findById(ownerId).orElseThrow(() ->
+                new NotFoundException("- OwnerId not found: " + ownerId));
 
-        Vehicle vehicle = VehicleCreator.create(ownerId, newVehicleDto);
+        Vehicle vehicle = VehicleCreator.create(owner, newVehicleDto);
 
-        VehicleChecker.isCorrect(vehicleRepository, ownerId, VehicleMapper.vehicleToFullDto(vehicle));
+        VehicleChecker.check(vehicleRepository, ownerId, VehicleMapper.vehicleToFullDto(vehicle));
 
         VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicle));
 
@@ -58,7 +61,14 @@ public class VehicleServiceImpl implements VehicleService {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
         }
 
-        VehicleFullDto fullDtoToReturn = VehicleUpdater.update(vehicleRepository, ownerId, vehicleId, inputVehicleDto);
+        VehicleChecker.check(vehicleRepository, ownerId, inputVehicleDto);
+
+        Vehicle vehicleToUpdate = vehicleRepository.findById(vehicleId).orElseThrow(() ->
+                new NotFoundException("- VehicleId not found: " + vehicleId));
+
+        VehicleUpdater.update(vehicleToUpdate, inputVehicleDto);
+
+        VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicleToUpdate));
 
         log.info("-- Vehicle has been updated: {}", fullDtoToReturn);
 

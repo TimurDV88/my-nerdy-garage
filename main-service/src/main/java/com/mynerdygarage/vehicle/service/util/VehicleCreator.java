@@ -1,16 +1,17 @@
-package com.mynerdygarage.vehicle.service;
+package com.mynerdygarage.vehicle.service.util;
 
+import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.vehicle.dto.NewVehicleDto;
 import com.mynerdygarage.vehicle.model.Vehicle;
 
 public class VehicleCreator {
 
-    public static Vehicle create(Long ownerId, NewVehicleDto newVehicleDto) {
+    public static Vehicle create(User owner, NewVehicleDto newVehicleDto) {
 
         Vehicle vehicle = new Vehicle();
 
-        vehicle.setOwnerId(ownerId);
+        vehicle.setOwner(owner);
         vehicle.setProducer(newVehicleDto.getProducer());
         vehicle.setModel(newVehicleDto.getModel());
 

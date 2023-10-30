@@ -120,9 +120,19 @@ public class VehicleIntegrationTest {
         assertEquals(properNewVehicleDto.getProducer(), updatedNameDto.getProducer());
         assertEquals(properNewVehicleDto.getModel(), updatedNameDto.getModel());
 
-        VehicleFullDto sameNameDto = new VehicleFullDto(null, null, null, null,
-                newName, null, null, null, null, null, null, null);
+        VehicleFullDto sameNameDto = new VehicleFullDto(
+                null, null, null, null,
+                newName, null, null, null,
+                null, null, null, null);
         assertThrows(ConflictOnRequestException.class, () -> vehicleController.update(ownerId, vehicleId, sameNameDto));
+
+        String NewNameUpperCase = newName.toUpperCase();
+        VehicleFullDto sameNameUpperCaseDto = new VehicleFullDto(
+                null, null, null, null,
+                NewNameUpperCase, null, null, null,
+                null, null, null, null);
+        assertThrows(ConflictOnRequestException.class, () ->
+                vehicleController.update(ownerId, vehicleId, sameNameUpperCaseDto));
     }
 
     @Test
@@ -140,7 +150,7 @@ public class VehicleIntegrationTest {
     }
 
     @Test
-    void shouldGetVehicleByOwnerId() {
+    void shouldGetVehiclesByOwnerId() {
 
         UserFullDto userFullDto = userController.add(properNewUserDto);
 

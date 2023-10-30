@@ -1,5 +1,6 @@
 package com.mynerdygarage.vehicle.dto;
 
+import com.mynerdygarage.user.dto.UserMapper;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.vehicle.model.Vehicle;
 
@@ -12,7 +13,7 @@ public class VehicleMapper {
 
         return new VehicleFullDto(
                 vehicle.getId(),
-                vehicle.getOwnerId(),
+                UserMapper.userToShortDto(vehicle.getOwner()),
                 vehicle.getProducer(),
                 vehicle.getModel(),
                 vehicle.getName(),
@@ -41,7 +42,7 @@ public class VehicleMapper {
 
         return new VehicleShortDto(
                 vehicle.getId(),
-                vehicle.getOwnerId(),
+                UserMapper.userToShortDto(vehicle.getOwner()),
                 vehicle.getName(),
                 CustomFormatter.dateToString(vehicle.getReleaseDate())
         );

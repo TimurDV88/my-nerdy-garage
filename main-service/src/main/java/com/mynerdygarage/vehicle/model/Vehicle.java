@@ -1,5 +1,6 @@
 package com.mynerdygarage.vehicle.model;
 
+import com.mynerdygarage.user.model.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +21,9 @@ public class Vehicle {
     @Setter(AccessLevel.NONE)
     private Long id;
 
-    @Column(name = "owner_id", nullable = false)
-    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
 
     @Column(name = "producer")
     private String producer;

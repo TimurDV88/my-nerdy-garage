@@ -1,4 +1,4 @@
-drop table IF EXISTS works_parts, parts, works, categories, vehicles, users CASCADE;
+--drop table IF EXISTS works_parts, parts, works, categories, vehicles, users CASCADE;
 
 CREATE TABLE IF NOT EXISTS users (
 
@@ -47,9 +47,14 @@ CREATE TABLE IF NOT EXISTS categories (
     name            VARCHAR(255) NOT NULL,
     description     VARCHAR(255),
 
+    creator_id      BIGINT, -- fk
+
     CONSTRAINT      pk_category PRIMARY KEY (id),
 
-    CONSTRAINT      UQ_CATEGORY_NAME UNIQUE (name)
+    CONSTRAINT  fk_cat_creator_id
+        FOREIGN KEY (creator_id)
+            REFERENCES users (id)
+            ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS works (

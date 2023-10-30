@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MngApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(MngApp.class, args);
-    }
 
+        SpringApplication.run(MngApp.class, args);
+
+    }
 }

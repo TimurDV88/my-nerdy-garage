@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    boolean existsByOwnerIdAndName(Long ownerId, String name);
+    boolean existsByOwnerIdAndNameIgnoreCase(Long ownerId, String name);
 
     Page<Vehicle> findByOwnerId(Long ownerId, Pageable pageable);
 }
