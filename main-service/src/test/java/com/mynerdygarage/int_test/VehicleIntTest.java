@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class VehicleIntegrationTest {
+public class VehicleIntTest {
 
     private final UserController userController;
 

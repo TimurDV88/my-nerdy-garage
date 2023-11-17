@@ -9,7 +9,12 @@ public class CategoryMapper {
 
     public static CategoryFullDto categoryToFullDto(Category category) {
 
-        return new CategoryFullDto(category.getName(), category.getDescription());
+        return new CategoryFullDto(
+                category.getId(),
+                category.getName(),
+                category.getDescription(),
+                category.getCreator()
+        );
     }
 
     public static List<CategoryFullDto> categoryToFullDto(Iterable<Category> categories) {

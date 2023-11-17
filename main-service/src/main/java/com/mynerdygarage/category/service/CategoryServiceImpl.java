@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,7 +34,7 @@ public class CategoryServiceImpl implements CategoryService {
         User creator = userRepository.findById(creatorId).orElseThrow(() ->
                 new NotFoundException("- CreatorId not found: " + creatorId));
 
-        Category category = CategoryCreator.create(newCategoryDto, creator);
+        Category category = CategoryCreator.createFromNewDto(newCategoryDto, creator);
 
         CategoryChecker.check(categoryRepository, creatorId, CategoryMapper.categoryToFullDto(category));
 
@@ -51,14 +50,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         log.info("-- Updating vehicle by vehicleIdId={}: {}", creatorId, inputDto);
 
-        if (!userRepository.existsById(creatorId)) {
-            throw new NotFoundException("- CreatorId not found: " + creatorId);
-        }
-
         CategoryChecker.check(categoryRepository, creatorId, inputDto);
 
-        Category categoryToUpdate = categoryRepository.findById(categoryId).orElseThrow(() ->
-                new NotFoundException("- CategoryId not found: " + categoryId));
+        Category categoryToUpdate = CategoryCreator.createFromFullDto(getById(creatorId, categoryId));
 
         CategoryUpdater.update(categoryToUpdate, inputDto);
 
@@ -122,19 +116,16 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryFullDto> getAvailableCategoriesByUserId(Long userId) {
 
-        log.info("-- Getting categories by userId:{}", userId);
+        log.info("-- Getting available categories by userId:{}", userId);
 
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("- UserId not found: " + userId);
         }
 
-        List<Long> ids = new ArrayList<>(List.of(userId));
-        ids.add(null);
-
         List<CategoryFullDto> listToReturn =
-                CategoryMapper.categoryToFullDto(categoryRepository.findByCreatorIdIn(ids));
+                CategoryMapper.categoryToFullDto(categoryRepository.findAvailableCategoriesByUserId(userId));
 
-        log.info("-- Categories list returned, size={}", listToReturn.size());
+        log.info("-- Available categories list returned, size={}", listToReturn.size());
 
         return listToReturn;
     }
@@ -144,14 +135,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         log.info("--- Deleting category by categoryId={}", categoryId);
 
-        if (!userRepository.existsById(creatorId)) {
-            throw new NotFoundException("- CreatorId not found: " + creatorId);
-        }
-
-        Category categoryToCheck = categoryRepository.findById(categoryId).orElseThrow(() ->
-                new NotFoundException("- CategoryId not found: " + categoryId));
-
-        CategoryFullDto dtoToShowInLog = CategoryMapper.categoryToFullDto(categoryToCheck);
+        CategoryFullDto dtoToShowInLog = getById(creatorId, categoryId);
 
         categoryRepository.deleteById(categoryId);
 

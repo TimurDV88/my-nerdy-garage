@@ -55,7 +55,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Transactional
     public VehicleFullDto update(Long ownerId, Long vehicleId, VehicleFullDto inputVehicleDto) {
 
-        log.info("-- Updating vehicle by vehicleIdId={}: {}", vehicleId, inputVehicleDto);
+        log.info("-- Updating vehicle by vehicleId={}: {}", vehicleId, inputVehicleDto);
 
         if (!userRepository.existsById(ownerId)) {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
@@ -123,10 +123,7 @@ public class VehicleServiceImpl implements VehicleService {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
         }
 
-        Vehicle vehicleToCheck = vehicleRepository.findById(vehicleId).orElseThrow(() ->
-                new NotFoundException("- VehicleId not found: " + vehicleId));
-
-        VehicleFullDto dtoToShowInLog = VehicleMapper.vehicleToFullDto(vehicleToCheck);
+        VehicleFullDto dtoToShowInLog = getById(ownerId, vehicleId);
 
         vehicleRepository.deleteById(vehicleId);
 

@@ -45,6 +45,6 @@ public class NewVehicleDto {
     private final Integer power;
 
     @Size(min = 2, message = "size must be between 2 and 250")
-    @Size(max = 20, message = "size must be between 2 and 250")
+    @Size(max = 250, message = "size must be between 2 and 250")
     private final String description;
 }
