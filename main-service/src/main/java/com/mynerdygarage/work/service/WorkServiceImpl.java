@@ -68,19 +68,7 @@ public class WorkServiceImpl implements WorkService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("- userId not found: " + userId);
         }
-/*
-        WorkChecker.check(workRepository, inputFullDto);
 
-        Vehicle vehicleToUpdate = vehicleRepository.findById(vehicleId).orElseThrow(() ->
-                new NotFoundException("- VehicleId not found: " + vehicleId));
-
-        VehicleUpdater.update(vehicleToUpdate, inputVehicleDto);
-
-        VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicleToUpdate));
-
-        log.info("-- Vehicle has been updated: {}", fullDtoToReturn);
-
-        return fullDtoToReturn;*/
         return null;
     }
 
