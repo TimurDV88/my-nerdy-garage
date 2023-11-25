@@ -6,7 +6,7 @@ import org.springframework.data.domain.Sort;
 
 public class PageRequestCreator {
 
-    public static PageRequest getPageRequest(int from, int size, Sort sort) {
+    public static PageRequest create(int from, int size, Sort sort) {
 
         PageRequest pageRequest;
 

@@ -1,30 +1,39 @@
 package com.mynerdygarage.work.service.util;
 
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
-import com.mynerdygarage.util.CustomFormatter;
-import com.mynerdygarage.work.dto.WorkFullDto;
+import com.mynerdygarage.work.model.Work;
 import com.mynerdygarage.work.repository.WorkRepository;
 
 import java.time.LocalDate;
 
 public class WorkChecker {
 
-    public static void check(WorkRepository workRepository, WorkFullDto workFullDto) {
+    private static void check(Work work) {
 
-        LocalDate startDate = CustomFormatter.stringToDate(workFullDto.getStartDate());
-        LocalDate endDate = CustomFormatter.stringToDate(workFullDto.getEndDate());
+        LocalDate startDate = work.getStartDate();
+        LocalDate endDate = work.getEndDate();
 
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new ConflictOnRequestException("- Start date cannot be after end date");
         }
 
-        if (startDate != null && startDate.isBefore(LocalDate.now()) && workFullDto.getIsPlanned()) {
+        if (startDate != null && startDate.isBefore(LocalDate.now()) && work.getIsPlanned()) {
             throw new ConflictOnRequestException("- If isPlanned start date must be after current date");
         }
+    }
+
+    public static void checkNewWork(WorkRepository workRepository, Work work) {
+
+        check(work);
 
         if (workRepository.existsByVehicleIdAndStartDateAndTitleIgnoreCase(
-                workFullDto.getVehicle().getId(), startDate, workFullDto.getTitle())) {
+                work.getVehicle().getId(), work.getStartDate(), work.getTitle())) {
             throw new ConflictOnRequestException("- Work with this VehicleId and StartDate and Title already exists");
         }
+    }
+
+    public static void checkUpdateWork(Work work) {
+
+        check(work);
     }
 }

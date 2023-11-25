@@ -3,11 +3,12 @@ package com.mynerdygarage.vehicle.service.util;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.vehicle.dto.NewVehicleDto;
+import com.mynerdygarage.vehicle.dto.VehicleUpdateDto;
 import com.mynerdygarage.vehicle.model.Vehicle;
 
 public class VehicleCreator {
 
-    public static Vehicle create(User owner, NewVehicleDto newVehicleDto) {
+    public static Vehicle createFromNewDto(User owner, NewVehicleDto newVehicleDto) {
 
         Vehicle vehicle = new Vehicle();
 
@@ -38,6 +39,32 @@ public class VehicleCreator {
 
         vehicle.setPower(newVehicleDto.getPower());
         vehicle.setDescription(newVehicleDto.getDescription());
+
+        return vehicle;
+    }
+
+    public static Vehicle createFromUpdateDto(VehicleUpdateDto vehicleUpdateDto) {
+
+        Vehicle vehicle = new Vehicle();
+
+        vehicle.setProducer(vehicleUpdateDto.getProducer());
+        vehicle.setModel(vehicleUpdateDto.getModel());
+        vehicle.setName(vehicleUpdateDto.getName());
+        vehicle.setColor(vehicleUpdateDto.getColor());
+        vehicle.setRegNumber(vehicleUpdateDto.getRegNumber());
+        vehicle.setReleaseDate(CustomFormatter.stringToDate(vehicleUpdateDto.getReleaseDate()));
+        vehicle.setEngineVolume(vehicleUpdateDto.getEngineVolume());
+
+        String fuelType;
+        if (vehicleUpdateDto.getFuelType() == null) {
+            fuelType = null;
+        } else {
+            fuelType = vehicleUpdateDto.getFuelType().toString();
+        }
+        vehicle.setFuelType(fuelType);
+
+        vehicle.setPower(vehicleUpdateDto.getPower());
+        vehicle.setDescription(vehicleUpdateDto.getDescription());
 
         return vehicle;
     }

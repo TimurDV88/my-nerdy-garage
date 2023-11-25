@@ -48,7 +48,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryFullDto update(Long creatorId, Long categoryId, CategoryFullDto inputDto) {
 
-        log.info("-- Updating vehicle by vehicleIdId={}: {}", creatorId, inputDto);
+        log.info("-- Updating vehicle by vehicleId={}: {}", creatorId, inputDto);
 
         CategoryChecker.check(categoryRepository, creatorId, inputDto);
 

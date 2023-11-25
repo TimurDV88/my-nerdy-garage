@@ -5,11 +5,12 @@ import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.vehicle.model.Vehicle;
 import com.mynerdygarage.work.dto.NewWorkDto;
+import com.mynerdygarage.work.dto.WorkUpdateDto;
 import com.mynerdygarage.work.model.Work;
 
 public class WorkCreator {
 
-    public static Work create(User user, Vehicle vehicle, Category category, NewWorkDto newWorkDto) {
+    public static Work createFromNewDto(User user, Vehicle vehicle, Category category, NewWorkDto newWorkDto) {
 
         Work work = new Work();
 
@@ -21,6 +22,20 @@ public class WorkCreator {
         work.setIsPlanned(newWorkDto.getIsPlanned());
         work.setStartDate(CustomFormatter.stringToDate(newWorkDto.getStartDate()));
         work.setEndDate(CustomFormatter.stringToDate(newWorkDto.getEndDate()));
+
+        return work;
+    }
+
+    public static Work createFromUpdateDto(Category category, WorkUpdateDto workUpdateDto) {
+
+        Work work = new Work();
+
+        work.setCategory(category);
+        work.setTitle(workUpdateDto.getTitle());
+        work.setDescription(workUpdateDto.getDescription());
+        work.setIsPlanned(workUpdateDto.getIsPlanned());
+        work.setStartDate(CustomFormatter.stringToDate(workUpdateDto.getStartDate()));
+        work.setEndDate(CustomFormatter.stringToDate(workUpdateDto.getEndDate()));
 
         return work;
     }

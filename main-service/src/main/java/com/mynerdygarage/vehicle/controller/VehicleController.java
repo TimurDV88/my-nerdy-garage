@@ -3,6 +3,7 @@ package com.mynerdygarage.vehicle.controller;
 import com.mynerdygarage.vehicle.dto.NewVehicleDto;
 import com.mynerdygarage.vehicle.dto.VehicleFullDto;
 import com.mynerdygarage.vehicle.dto.VehicleShortDto;
+import com.mynerdygarage.vehicle.dto.VehicleUpdateDto;
 import com.mynerdygarage.vehicle.service.VehicleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,9 +31,9 @@ public class VehicleController {
     @PatchMapping("/{vehicleId}")
     public VehicleFullDto update(@RequestHeader("X-Sharer-User-Id") Long ownerId,
                                  @PathVariable @NotNull Long vehicleId,
-                                 @RequestBody @Valid VehicleFullDto vehicleFullDto) {
+                                 @RequestBody @Valid VehicleUpdateDto vehicleUpdateDto) {
 
-        return vehicleService.update(ownerId, vehicleId, vehicleFullDto);
+        return vehicleService.update(ownerId, vehicleId, vehicleUpdateDto);
     }
 
     @GetMapping("/{vehicleId}")

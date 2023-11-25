@@ -4,10 +4,7 @@ import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.util.PageRequestCreator;
-import com.mynerdygarage.vehicle.dto.NewVehicleDto;
-import com.mynerdygarage.vehicle.dto.VehicleFullDto;
-import com.mynerdygarage.vehicle.dto.VehicleMapper;
-import com.mynerdygarage.vehicle.dto.VehicleShortDto;
+import com.mynerdygarage.vehicle.dto.*;
 import com.mynerdygarage.vehicle.model.Vehicle;
 import com.mynerdygarage.vehicle.repository.VehicleRepository;
 import com.mynerdygarage.vehicle.service.util.VehicleChecker;
@@ -40,9 +37,9 @@ public class VehicleServiceImpl implements VehicleService {
         User owner = userRepository.findById(ownerId).orElseThrow(() ->
                 new NotFoundException("- OwnerId not found: " + ownerId));
 
-        Vehicle vehicle = VehicleCreator.create(owner, newVehicleDto);
+        Vehicle vehicle = VehicleCreator.createFromNewDto(owner, newVehicleDto);
 
-        VehicleChecker.check(vehicleRepository, ownerId, VehicleMapper.vehicleToFullDto(vehicle));
+        VehicleChecker.check(vehicleRepository, ownerId, vehicle);
 
         VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicle));
 
@@ -53,20 +50,22 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     @Transactional
-    public VehicleFullDto update(Long ownerId, Long vehicleId, VehicleFullDto inputVehicleDto) {
+    public VehicleFullDto update(Long ownerId, Long vehicleId, VehicleUpdateDto inputVehicleDto) {
 
         log.info("-- Updating vehicle by vehicleId={}: {}", vehicleId, inputVehicleDto);
-
-        if (!userRepository.existsById(ownerId)) {
-            throw new NotFoundException("- OwnerId not found: " + ownerId);
-        }
-
-        VehicleChecker.check(vehicleRepository, ownerId, inputVehicleDto);
 
         Vehicle vehicleToUpdate = vehicleRepository.findById(vehicleId).orElseThrow(() ->
                 new NotFoundException("- VehicleId not found: " + vehicleId));
 
-        VehicleUpdater.update(vehicleToUpdate, inputVehicleDto);
+        if (!ownerId.equals(vehicleToUpdate.getOwner().getId())) {
+            throw new NotFoundException("- User with Id=" + ownerId + " is not owner of vehicle with id=" + vehicleId);
+        }
+
+        Vehicle inputVehicle = VehicleCreator.createFromUpdateDto(inputVehicleDto);
+
+        VehicleChecker.check(vehicleRepository, ownerId, inputVehicle);
+
+        VehicleUpdater.update(vehicleToUpdate, inputVehicle);
 
         VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicleToUpdate));
 
@@ -103,7 +102,7 @@ public class VehicleServiceImpl implements VehicleService {
         }
 
         Sort sort = Sort.by("id").ascending();
-        PageRequest pageRequest = PageRequestCreator.getPageRequest(from, size, sort);
+        PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
 
         List<VehicleShortDto> listToReturn =
                 VehicleMapper.vehicleToShortDto(vehicleRepository.findByOwnerId(ownerId, pageRequest));
@@ -118,10 +117,6 @@ public class VehicleServiceImpl implements VehicleService {
     public void removeById(Long ownerId, Long vehicleId) {
 
         log.info("--- Deleting vehicle by vehicleId={}", vehicleId);
-
-        if (!userRepository.existsById(ownerId)) {
-            throw new NotFoundException("- OwnerId not found: " + ownerId);
-        }
 
         VehicleFullDto dtoToShowInLog = getById(ownerId, vehicleId);
 
