@@ -1,4 +1,4 @@
---drop table IF EXISTS works_parts, parts, works, categories, vehicles, users CASCADE;
+drop table IF EXISTS works_parts, parts, works, categories, vehicles, users CASCADE;
 
 CREATE TABLE IF NOT EXISTS users (
 

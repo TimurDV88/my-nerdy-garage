@@ -30,7 +30,7 @@ public class CategoryMapper {
 
     public static CategoryShortDto categoryToShortDto(Category category) {
 
-        return new CategoryShortDto(category.getName());
+        return new CategoryShortDto(category.getId(), category.getName());
     }
 
     public static List<CategoryShortDto> categoryToShortDto(Iterable<Category> categories) {

@@ -168,7 +168,6 @@ public class CategoryIntTest {
         Long categoryId = categoryFullDtoToCheck.getId();
 
         List<CategoryFullDto> actualDefaultCategories = categoryController.getDefaultCategories(creatorId);
-        int sizeOfDefaultList = actualDefaultCategories.size();
         CategoryFullDto firstDefaultCategory = actualDefaultCategories.get(0);
 
         List<CategoryFullDto> actualAvailableCategories = categoryController.getAvailableCategoriesByUserId(creatorId);
