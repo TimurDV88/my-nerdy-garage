@@ -161,7 +161,7 @@ public class CategoryIntTest {
                 categoryController.getCustomCategoriesByCreatorId(creatorId).get(0));
     }
 
-    //@Test
+    @Test
     void shouldGetAvailableCategoriesByCreatorId() {
 
         CategoryFullDto categoryFullDtoToCheck = categoryController.addCategory(creatorId, properNewCategoryDto);
