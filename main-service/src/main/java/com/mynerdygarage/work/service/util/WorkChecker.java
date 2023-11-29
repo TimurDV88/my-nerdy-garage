@@ -8,32 +8,47 @@ import java.time.LocalDate;
 
 public class WorkChecker {
 
-    private static void check(Work work) {
+    private static void check(Work workToCheck) {
 
-        LocalDate startDate = work.getStartDate();
-        LocalDate endDate = work.getEndDate();
+        LocalDate startDate = workToCheck.getStartDate();
+        LocalDate endDate = workToCheck.getEndDate();
 
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new ConflictOnRequestException("- Start date cannot be after end date");
         }
 
-        if (startDate != null && startDate.isBefore(LocalDate.now()) && work.getIsPlanned()) {
+        if (startDate != null && startDate.isBefore(LocalDate.now()) && workToCheck.getIsPlanned()) {
             throw new ConflictOnRequestException("- If isPlanned start date must be after current date");
         }
     }
 
-    public static void checkNewWork(WorkRepository workRepository, Work work) {
+    public static void checkNewWork(WorkRepository workRepository, Work newWorkToCheck) {
 
-        check(work);
+        check(newWorkToCheck);
 
-        if (workRepository.existsByVehicleIdAndStartDateAndTitleIgnoreCase(
-                work.getVehicle().getId(), work.getStartDate(), work.getTitle())) {
+        Work foundWork = workRepository.findByVehicleIdAndStartDateAndTitleIgnoreCase(
+                newWorkToCheck.getVehicle().getId(),
+                newWorkToCheck.getStartDate(),
+                newWorkToCheck.getTitle());
+
+        if (foundWork != null) {
             throw new ConflictOnRequestException("- Work with this VehicleId and StartDate and Title already exists");
         }
     }
 
-    public static void checkUpdateWork(Work work) {
+    public static void checkUpdateWork(WorkRepository workRepository, Work updatedWorkToCheck) {
 
-        check(work);
+        check(updatedWorkToCheck);
+
+        Work foundWork = workRepository.findByVehicleIdAndStartDateAndTitleIgnoreCase(
+                updatedWorkToCheck.getVehicle().getId(),
+                updatedWorkToCheck.getStartDate(),
+                updatedWorkToCheck.getTitle()
+        );
+
+        if (!foundWork.getId().equals(updatedWorkToCheck.getId())) {
+            throw new ConflictOnRequestException(
+                    "- Another work with this VehicleId and StartDate and Title already exists");
+        }
     }
 }

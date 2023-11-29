@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public interface WorkRepository extends JpaRepository<Work, Long>, QuerydslPredicateExecutor<Work> {
 
-    boolean existsByVehicleIdAndStartDateAndTitleIgnoreCase(Long userId, LocalDate startDate, String title);
+    Work findByVehicleIdAndStartDateAndTitleIgnoreCase(Long vehicleId, LocalDate startDate, String title);
 
     Page<Work> findByVehicleId(Long vehicleId, Pageable pageable);
 }

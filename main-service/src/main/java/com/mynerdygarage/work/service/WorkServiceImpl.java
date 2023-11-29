@@ -75,14 +75,19 @@ public class WorkServiceImpl implements WorkService {
             throw new NotFoundException("- User with Id=" + userId + " is not initiator of work with id=" + workId);
         }
 
-        Category category = categoryRepository.findById(inputDto.getCategoryId()).orElseThrow(() ->
-                new NotFoundException("- CategoryId not found: " + inputDto.getCategoryId()));
+        Category category;
+        if (inputDto.getCategoryId() != null) {
+            category = categoryRepository.findById(inputDto.getCategoryId()).orElseThrow(() ->
+                    new NotFoundException("- CategoryId not found: " + inputDto.getCategoryId()));
+        } else {
+            category = workToUpdate.getCategory();
+        }
 
         Work inputWork = WorkCreator.createFromUpdateDto(category, inputDto);
 
-        WorkChecker.checkUpdateWork(inputWork);
-
         WorkUpdater.update(workToUpdate, inputWork);
+
+        WorkChecker.checkUpdateWork(workRepository, workToUpdate);
 
         WorkFullDto fullDtoToReturn = WorkMapper.workToFullDto(workRepository.save(workToUpdate));
 
