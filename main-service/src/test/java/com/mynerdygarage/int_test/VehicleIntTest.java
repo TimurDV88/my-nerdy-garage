@@ -8,6 +8,7 @@ import com.mynerdygarage.user.dto.UserFullDto;
 import com.mynerdygarage.vehicle.controller.VehicleController;
 import com.mynerdygarage.vehicle.dto.NewVehicleDto;
 import com.mynerdygarage.vehicle.dto.VehicleFullDto;
+import com.mynerdygarage.vehicle.dto.VehicleUpdateDto;
 import com.mynerdygarage.vehicle.model.FuelType;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class VehicleIntegrationTest {
+public class VehicleIntTest {
 
     private final UserController userController;
 
@@ -112,17 +113,26 @@ public class VehicleIntegrationTest {
         Long vehicleId = vehicleDtoToCheck.getId();
 
         String newName = "newName";
-        VehicleFullDto updatedNameDto = new VehicleFullDto(null, null, null, null,
-                newName, null, null, null, null, null, null, null);
-        updatedNameDto = vehicleController.update(ownerId, vehicleId, updatedNameDto);
+        VehicleUpdateDto updatedNameDto = new VehicleUpdateDto(null, null, newName, null,
+                null, null, null, null, null, null);
+        VehicleFullDto updatedNameFullDto = vehicleController.update(ownerId, vehicleId, updatedNameDto);
 
-        assertEquals(newName, updatedNameDto.getName());
-        assertEquals(properNewVehicleDto.getProducer(), updatedNameDto.getProducer());
-        assertEquals(properNewVehicleDto.getModel(), updatedNameDto.getModel());
+        assertEquals(newName, updatedNameFullDto.getName());
+        assertEquals(properNewVehicleDto.getProducer(), updatedNameFullDto.getProducer());
+        assertEquals(properNewVehicleDto.getModel(), updatedNameFullDto.getModel());
 
-        VehicleFullDto sameNameDto = new VehicleFullDto(null, null, null, null,
-                newName, null, null, null, null, null, null, null);
-        assertThrows(ConflictOnRequestException.class, () -> vehicleController.update(ownerId, vehicleId, sameNameDto));
+        VehicleUpdateDto sameNameUpdateDto = new VehicleUpdateDto(
+                null, null, newName, null, null, null, null,
+                null, null, null);
+        assertThrows(ConflictOnRequestException.class, ()
+                -> vehicleController.update(ownerId, vehicleId, sameNameUpdateDto));
+
+        String NewNameUpperCase = newName.toUpperCase();
+        VehicleUpdateDto sameNameUpperCaseDto = new VehicleUpdateDto(
+                null, null, NewNameUpperCase, null, null, null, null,
+                null, null, null);
+        assertThrows(ConflictOnRequestException.class, () ->
+                vehicleController.update(ownerId, vehicleId, sameNameUpperCaseDto));
     }
 
     @Test
@@ -140,7 +150,7 @@ public class VehicleIntegrationTest {
     }
 
     @Test
-    void shouldGetVehicleByOwnerId() {
+    void shouldGetVehiclesByOwnerId() {
 
         UserFullDto userFullDto = userController.add(properNewUserDto);
 

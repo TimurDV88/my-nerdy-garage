@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
         properties = "db.name=test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserIntegrationTest {
+class UserIntTest {
 
     private final UserController userController;
     private static NewUserDto properNewUserDto;

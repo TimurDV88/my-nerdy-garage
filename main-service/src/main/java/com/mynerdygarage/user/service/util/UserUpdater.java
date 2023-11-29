@@ -1,4 +1,4 @@
-package com.mynerdygarage.user.service;
+package com.mynerdygarage.user.service.util;
 
 import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.dto.UserFullDto;

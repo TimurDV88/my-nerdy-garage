@@ -3,18 +3,15 @@ package com.mynerdygarage.vehicle.dto;
 import com.mynerdygarage.vehicle.model.FuelType;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Data
-public class NewVehicleDto {
+public class VehicleUpdateDto {
 
-    @NotNull
     @Size(min = 2, message = "size must be between 2 and 20")
     @Size(max = 20, message = "size must be between 2 and 20")
     private final String producer;
 
-    @NotNull
     @Size(min = 2, message = "size must be between 2 and 20")
     @Size(max = 20, message = "size must be between 2 and 20")
     private final String model;

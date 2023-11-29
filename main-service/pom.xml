@@ -67,8 +67,6 @@
             <optional>true</optional>
         </dependency>
 
-
-
         <!-- add querydsl dependency-->
 
         <dependency>
