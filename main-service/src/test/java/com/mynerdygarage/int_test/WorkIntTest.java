@@ -346,5 +346,9 @@ public class WorkIntTest {
 
         assertThrows(NotFoundException.class,
                 () -> workController.getById(userId, work1Id));
+
+        // check wrong id
+        assertThrows(NotFoundException.class,
+                () -> workController.removeById(userId, 999L));
     }
 }
