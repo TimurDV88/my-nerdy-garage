@@ -28,7 +28,7 @@ public class WorkQueryCreator {
         //vehicleIds
         BooleanExpression byVehicleIds = null;
         if (vehicleIds != null) {
-            byVehicleIds = QWork.work.category.id.in(vehicleIds);
+            byVehicleIds = QWork.work.vehicle.id.in(vehicleIds);
         }
 
         //categoryIds
@@ -46,13 +46,13 @@ public class WorkQueryCreator {
         //start
         BooleanExpression byStart = null;
         if (start != null) {
-            byStart = QWork.work.startDate.eq(start);
+            byStart = QWork.work.startDate.goe(start);
         }
 
         //end
         BooleanExpression byEnd = null;
         if (end != null) {
-            byEnd = QWork.work.endDate.eq(end);
+            byEnd = QWork.work.endDate.loe(end);
         }
 
         return byUserId.and(byText).and(byVehicleIds).and(byCategoryIds).and(byIsPlanned).and(byStart).and(byEnd);

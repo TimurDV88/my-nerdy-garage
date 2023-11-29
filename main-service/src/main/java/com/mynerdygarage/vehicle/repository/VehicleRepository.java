@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    boolean existsByOwnerId(Long ownerId);
+    boolean existsByOwnerIdAndId(Long id, Long ownerId);
 
     @Query("SELECT v.id " +
             "FROM Vehicle AS v " +

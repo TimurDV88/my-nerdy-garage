@@ -2,6 +2,8 @@ package com.mynerdygarage.int_test;
 
 import com.mynerdygarage.category.controller.CategoryController;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
+import com.mynerdygarage.error.exception.IncorrectRequestException;
+import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.controller.UserController;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
@@ -21,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
 @SpringBootTest(
@@ -209,8 +211,9 @@ public class WorkIntTest {
 
         assertEquals(addedWork, workToCheck);
 
-
-
+        // check wrong id
+        assertThrows(NotFoundException.class,
+                () -> workController.getById(userId, 999L));
     }
 
     @Test
@@ -225,7 +228,7 @@ public class WorkIntTest {
         Long work2Id = addedWork2.getId();
 
         List<WorkShortDto> listOfWorks =
-                workController.getByVehicleId(userId, vehicleFullDto1.getId(), "id",0,10);
+                workController.getByVehicleId(userId, vehicleFullDto1.getId(), "id", 0, 10);
 
         assertEquals(work1Id, listOfWorks.get(0).getId());
         assertEquals(addedWork1.getTitle(), listOfWorks.get(0).getTitle());
@@ -238,11 +241,110 @@ public class WorkIntTest {
         WorkFullDto addedWork4 = workController.addWork(userId, newWorkDto4);
         Long work4Id = addedWork4.getId();
 
-        listOfWorks = workController.getByVehicleId(userId, vehicleFullDto2.getId(), "start_Date",0,10);
+        listOfWorks =
+                workController.getByVehicleId(userId, vehicleFullDto2.getId(), "start_Date", 0, 10);
 
         assertEquals(work4Id, listOfWorks.get(0).getId());
         assertEquals(addedWork4.getTitle(), listOfWorks.get(0).getTitle());
         assertEquals(work3Id, listOfWorks.get(1).getId());
         assertEquals(addedWork3.getTitle(), listOfWorks.get(1).getTitle());
+
+        // check wrong vehicle id
+        assertThrows(NotFoundException.class,
+                () -> workController.getByVehicleId(userId, 999L, "id", 0, 10));
+    }
+
+    @Test
+    void shouldGetByParameters() {
+
+        Long userId = userFullDto.getId();
+        Long vehicleId1 = vehicleFullDto1.getId();
+        List<WorkFullDto> workList;
+
+        WorkFullDto addedWork1 = workController.addWork(userId, newWorkDto1);
+        Long work1Id = addedWork1.getId();
+
+        WorkFullDto addedWork2 = workController.addWork(userId, newWorkDto2);
+        Long work2Id = addedWork2.getId();
+
+        WorkFullDto addedWork3 = workController.addWork(userId, newWorkDto3);
+        Long work3Id = addedWork3.getId();
+
+        WorkFullDto addedWork4 = workController.addWork(userId, newWorkDto4);
+        Long work4Id = addedWork4.getId();
+
+        // by text
+        workList = workController.getByParams(userId, "work", null, null,
+                null, null, null, "id", 0, 10);
+        assertEquals(4, workList.size());
+        assertEquals(work1Id, workList.get(0).getId());
+        assertEquals(work2Id, workList.get(1).getId());
+        assertEquals(work3Id, workList.get(2).getId());
+        assertEquals(work4Id, workList.get(3).getId());
+
+        // by vehicle_id with fake id=999L
+        workList = workController.getByParams(userId, null, new Long[]{vehicleId1, 999L}, null,
+                null, null, null, "id", 0, 10);
+
+        assertEquals(2, workList.size());
+        assertEquals(work1Id, workList.get(0).getId());
+        assertEquals(work2Id, workList.get(1).getId());
+
+        // by category_id with fake id=999L
+        workList =
+                workController.getByParams(userId, null, null, new Long[]{category4Id, category3Id, 999L},
+                        null, null, null, "id", 0, 10);
+        assertEquals(2, workList.size());
+        assertEquals(work3Id, workList.get(0).getId());
+        assertEquals(work4Id, workList.get(1).getId());
+
+        // by is_planned
+        workList = workController.getByParams(userId, null, null, null,
+                true, null, null, "id", 0, 10);
+        assertEquals(2, workList.size());
+        assertEquals(work1Id, workList.get(0).getId());
+        assertEquals(work3Id, workList.get(1).getId());
+
+        // by start
+        workList = workController.getByParams(userId, null, null, null,
+                null, "01.01.2025", null, "id", 0, 10);
+        assertEquals(1, workList.size());
+        assertEquals(work3Id, workList.get(0).getId());
+
+        // by end
+        workList = workController.getByParams(userId, null, null, null,
+                null, null, "05.01.2021", "id", 0, 10);
+        assertEquals(2, workList.size());
+        assertEquals(work2Id, workList.get(0).getId());
+        assertEquals(work4Id, workList.get(1).getId());
+
+        // test sort by isPlanned
+        workList = workController.getByParams(userId, null, null, null,
+                null, null, null, "is_Planned", 0, 10);
+        assertEquals(4, workList.size());
+        assertEquals(work2Id, workList.get(0).getId());
+        assertEquals(work1Id, workList.get(1).getId());
+        assertEquals(work4Id, workList.get(2).getId());
+        assertEquals(work3Id, workList.get(3).getId());
+
+        // check error when start after end
+        assertThrows(IncorrectRequestException.class, () ->
+                workController.getByParams(userId, null, null, null,
+                null, "02.01.2021", "01.01.2021", "id", 0, 10));
+    }
+
+    @Test
+    void shouldRemoveById() {
+
+        Long userId = userFullDto.getId();
+        WorkFullDto addedWork1 = workController.addWork(userId, newWorkDto1);
+        Long work1Id = addedWork1.getId();
+
+        assertEquals(addedWork1, workController.getById(userId, work1Id));
+
+        workController.removeById(userId, work1Id);
+
+        assertThrows(NotFoundException.class,
+                () -> workController.getById(userId, work1Id));
     }
 }

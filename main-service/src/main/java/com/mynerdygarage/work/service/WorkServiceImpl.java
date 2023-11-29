@@ -118,7 +118,7 @@ public class WorkServiceImpl implements WorkService {
 
         log.info("-- Returning works list by vehicleId={}", vehicleId);
 
-        if (!vehicleRepository.existsByOwnerId(userId)) {
+        if (!vehicleRepository.existsByOwnerIdAndId(userId, vehicleId)) {
             throw new NotFoundException("- User with id=" + userId + " does not own vehicle with id=" + vehicleId);
         }
 
@@ -151,7 +151,7 @@ public class WorkServiceImpl implements WorkService {
         // checks:
 
         // text
-        if (text.isBlank() || text.length() < 2) {
+        if (text != null && (text.isBlank() || text.length() < 2)) {
             text = null;
         }
 
@@ -180,7 +180,6 @@ public class WorkServiceImpl implements WorkService {
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new IncorrectRequestException("- start cannot be after end");
         }
-
         //end of checks
 
         BooleanExpression byParameters =
