@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = CategoryCreator.createFromNewDto(newCategoryDto, creator);
 
-        CategoryChecker.check(categoryRepository, creatorId, CategoryMapper.categoryToFullDto(category));
+        CategoryChecker.checkNewCategory(categoryRepository, creatorId, category);
 
         CategoryFullDto fullDtoToReturn = CategoryMapper.categoryToFullDto(categoryRepository.save(category));
 
@@ -48,11 +48,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryFullDto update(Long creatorId, Long categoryId, CategoryFullDto inputDto) {
 
-        log.info("-- Updating vehicle by vehicleId={}: {}", creatorId, inputDto);
+        log.info("-- Updating category by categoryId={}: {}", categoryId, inputDto);
 
-        CategoryChecker.check(categoryRepository, creatorId, inputDto);
+        Category categoryToUpdate = categoryRepository.findById(categoryId).orElseThrow(() ->
+                new NotFoundException("- CategoryId not found: " + categoryId));
 
-        Category categoryToUpdate = CategoryCreator.createFromFullDto(getById(creatorId, categoryId));
+        CategoryChecker.checkUpdateCategory(categoryRepository, creatorId, inputDto, categoryToUpdate);
 
         CategoryUpdater.update(categoryToUpdate, inputDto);
 

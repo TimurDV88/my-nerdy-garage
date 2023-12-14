@@ -185,6 +185,7 @@ public class WorkServiceImpl implements WorkService {
         BooleanExpression byParameters =
                 WorkQueryCreator.createBooleanExpression(
                         userId, text, vehicleIds, categoryIds, isPlanned, startDate, endDate);
+
         Sort sort = WorkSorter.createSort(sortBy);
         PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
 
@@ -198,6 +199,7 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    @Transactional
     public void removeById(Long userId, Long workId) {
 
         log.info("--- Deleting work by workId={}", workId);

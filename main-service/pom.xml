@@ -2,21 +2,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>mynerdygarage</artifactId>
-        <groupId>com.davletgareev.timur</groupId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.mynerdygarage</groupId>
+        <artifactId>mynerdygarage</artifactId>
+        <version>v.0.1</version>
+    </parent>
 
     <artifactId>main-service</artifactId>
 
-    <!--<packaging>jar</packaging> -->
-
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <querydsl.version>5.0.0</querydsl.version>
     </properties>
 
     <dependencies>
@@ -67,12 +64,29 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- add querydsl dependency-->
+        <!-- Test db -->
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- querydsl -->
+
+        <dependency>
+            <groupId>com.querydsl</groupId>
+            <artifactId>querydsl-apt</artifactId>
+            <version>${querydsl.version}</version>
+            <classifier>jakarta</classifier>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-jpa</artifactId>
-            <version>5.0.0</version>
+            <classifier>jakarta</classifier>
+            <version>${querydsl.version}</version>
         </dependency>
 
     </dependencies>
@@ -100,18 +114,11 @@
                             <goal>process</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/generated-sources/java</outputDirectory>
+                            <!-- <outputDirectory>target/classes/java</outputDirectory> -->
                             <processor>com.querydsl.apt.jpa.JPAAnnotationProcessor</processor>
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.querydsl</groupId>
-                        <artifactId>querydsl-apt</artifactId>
-                        <version>5.0.0</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
         </plugins>

@@ -3,12 +3,12 @@ package com.mynerdygarage.work.model;
 import com.mynerdygarage.category.model.Category;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.vehicle.model.Vehicle;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity

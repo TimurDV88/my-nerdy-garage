@@ -5,12 +5,12 @@ import com.mynerdygarage.work.dto.WorkFullDto;
 import com.mynerdygarage.work.dto.WorkShortDto;
 import com.mynerdygarage.work.dto.WorkUpdateDto;
 import com.mynerdygarage.work.service.WorkService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController

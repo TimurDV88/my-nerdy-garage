@@ -1,6 +1,6 @@
 package com.mynerdygarage.category.dto;
 
-import com.mynerdygarage.user.model.User;
+import com.mynerdygarage.user.dto.UserShortDto;
 import lombok.Data;
 
 @Data
@@ -12,5 +12,5 @@ public class CategoryFullDto {
 
     private final String description;
 
-    private final User creator;
+    private final UserShortDto creator;
 }

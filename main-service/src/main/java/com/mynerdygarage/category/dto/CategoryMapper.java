@@ -1,6 +1,7 @@
 package com.mynerdygarage.category.dto;
 
 import com.mynerdygarage.category.model.Category;
+import com.mynerdygarage.user.dto.UserMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ public class CategoryMapper {
                 category.getId(),
                 category.getName(),
                 category.getDescription(),
-                category.getCreator()
+                UserMapper.userToShortDto(category.getCreator())
         );
     }
 

@@ -3,28 +3,30 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-    <packaging>pom</packaging>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.2.0</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
 
     <modules>
         <module>main-service</module>
     </modules>
 
-    <parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.5</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+	<properties>
+		<maven.compiler.target>17</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 
-	<groupId>com.davletgareev.timur</groupId>
+	<packaging>pom</packaging>
+
+	<groupId>com.mynerdygarage</groupId>
 	<artifactId>mynerdygarage</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>v.0.1</version>
 	<name>mynerdygarage</name>
 	<description>deep carcare app</description>
 
-	<properties>
-		<java.version>11</java.version>
-	</properties>
 
 	<dependencies>
 

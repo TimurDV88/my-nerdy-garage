@@ -1,12 +1,11 @@
 package com.mynerdygarage.category.model;
 
 import com.mynerdygarage.user.model.User;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "categories")

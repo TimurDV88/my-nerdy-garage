@@ -1,6 +1,7 @@
 package com.mynerdygarage.int_test;
 
 import com.mynerdygarage.category.controller.CategoryController;
+import com.mynerdygarage.category.dto.CategoryFullDto;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.IncorrectRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
@@ -21,16 +22,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test-h2")
 @Transactional
-@SpringBootTest(
-        properties = "db.name=test",
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class WorkIntTest {
 
@@ -90,10 +91,12 @@ public class WorkIntTest {
         );
         vehicleFullDto2 = vehicleController.addVehicle(userFullDto.getId(), anotherNewVehicleDto);
 
-        category1Id = categoryController.getDefaultCategories(userFullDto.getId()).get(0).getId();
-        category2Id = categoryController.getDefaultCategories(userFullDto.getId()).get(1).getId();
-        category3Id = categoryController.getDefaultCategories(userFullDto.getId()).get(2).getId();
-        category4Id = categoryController.getDefaultCategories(userFullDto.getId()).get(3).getId();
+        List<CategoryFullDto> categoryList = categoryController.getDefaultCategories(userFullDto.getId());
+
+        category1Id = categoryList.get(0).getId();
+        category2Id = categoryList.get(1).getId();
+        category3Id = categoryList.get(2).getId();
+        category4Id = categoryList.get(3).getId();
 
         newWorkDto1 = new NewWorkDto("work1", "descr1", vehicleFullDto1.getId(), category1Id,
                 true, null, null);
@@ -330,7 +333,7 @@ public class WorkIntTest {
         // check error when start after end
         assertThrows(IncorrectRequestException.class, () ->
                 workController.getByParams(userId, null, null, null,
-                null, "02.01.2021", "01.01.2021", "id", 0, 10));
+                        null, "02.01.2021", "01.01.2021", "id", 0, 10));
     }
 
     @Test

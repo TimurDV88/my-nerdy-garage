@@ -33,7 +33,7 @@ public class UserMapper {
 
     public static UserShortDto userToShortDto(User user) {
 
-        return new UserShortDto(user.getId(), user.getName());
+        return user != null ? new UserShortDto(user.getId(), user.getName()) : null;
     }
 
     public static List<UserShortDto> userToShortDto(Iterable<User> users) {

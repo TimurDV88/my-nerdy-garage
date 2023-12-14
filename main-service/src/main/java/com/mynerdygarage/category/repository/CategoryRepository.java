@@ -14,7 +14,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
     @Query("SELECT c " +
             "FROM Category AS c " +
-            "WHERE c.creator.id = NULL " +
+            "WHERE c.creator.id IS NULL " +
             "OR c.creator.id = :userId " +
             "ORDER BY c.id")
     List<Category> findAvailableCategoriesByUserId(Long userId);

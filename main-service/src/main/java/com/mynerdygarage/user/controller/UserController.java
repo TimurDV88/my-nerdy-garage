@@ -3,12 +3,11 @@ package com.mynerdygarage.user.controller;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
 import com.mynerdygarage.user.service.UserService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @RestController
 @RequiredArgsConstructor
