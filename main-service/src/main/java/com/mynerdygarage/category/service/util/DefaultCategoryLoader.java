@@ -1,7 +1,7 @@
 package com.mynerdygarage.category.service.util;
 
+import com.mynerdygarage.category.dafault.DefaultCategoriesHandler;
 import com.mynerdygarage.category.model.Category;
-import com.mynerdygarage.category.model.dafault.DefaultCategoriesHandler;
 import com.mynerdygarage.category.repository.CategoryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -36,8 +35,7 @@ public class DefaultCategoryLoader implements ApplicationRunner {
         List<Category> defaultCategories = DefaultCategoriesHandler.getDefaultCategories();
 
         List<String> dbDefaultCategories = categoryRepository.findByCreatorId(null).stream()
-                .map(Category::getName)
-                .collect(Collectors.toList());
+                .map(Category::getName).toList();
 
         for (Category category : defaultCategories) {
 

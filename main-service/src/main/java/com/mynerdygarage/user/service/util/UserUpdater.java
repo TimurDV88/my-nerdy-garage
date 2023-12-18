@@ -21,6 +21,6 @@ public class UserUpdater {
         NullChecker.setIfNotNull(user::setEmail, inputFullUserDto.getEmail());
         NullChecker.setIfNotNull(user::setBirthDate, CustomFormatter.stringToDate(inputFullUserDto.getBirthDate()));
 
-        return UserMapper.userToFullDto(userRepository.save(user));
+        return UserMapper.modelToFullDto(userRepository.save(user));
     }
 }

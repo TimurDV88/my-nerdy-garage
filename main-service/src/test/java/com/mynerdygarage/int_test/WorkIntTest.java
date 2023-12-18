@@ -99,13 +99,13 @@ public class WorkIntTest {
         category4Id = categoryList.get(3).getId();
 
         newWorkDto1 = new NewWorkDto("work1", "descr1", vehicleFullDto1.getId(), category1Id,
-                true, null, null);
+                "PLANNED", null, null);
         newWorkDto2 = new NewWorkDto("work2", "descr2", vehicleFullDto1.getId(), category2Id,
-                false, "01.01.2020", "05.01.2020");
+                null, "01.01.2020", "05.01.2020");
         newWorkDto3 = new NewWorkDto("work3", "descr3", vehicleFullDto2.getId(), category3Id,
-                true, "01.01.2025", "05.01.2025");
+                "PLANNED", "01.01.2025", "05.01.2025");
         newWorkDto4 = new NewWorkDto("work4", "descr4", vehicleFullDto2.getId(), category4Id,
-                false, "01.01.2021", "05.01.2021");
+                null, "01.01.2021", "05.01.2021");
     }
 
     @Test
@@ -117,25 +117,25 @@ public class WorkIntTest {
         assertEquals(newWorkDto1.getDescription(), workToCheck.getDescription());
         assertEquals(newWorkDto1.getVehicleId(), workToCheck.getVehicle().getId());
         assertEquals(newWorkDto1.getCategoryId(), workToCheck.getCategory().getId());
-        assertEquals(newWorkDto1.getIsPlanned(), workToCheck.getIsPlanned());
+        assertEquals(newWorkDto1.getStatus(), workToCheck.getStatus());
         assertEquals(newWorkDto1.getStartDate(), workToCheck.getStartDate());
         assertEquals(newWorkDto1.getEndDate(), workToCheck.getEndDate());
 
         //check errors
         NewWorkDto startBeforeEndDto = new NewWorkDto("wrongStart", null, vehicleFullDto1.getId(),
-                category1Id, false, "01.01.2022", "01.01.2021");
+                category1Id, null, "01.01.2022", "01.01.2021");
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.addWork(userFullDto.getId(), startBeforeEndDto));
 
         NewWorkDto startBeforeNowAndIsPlannedDto =
                 new NewWorkDto("wrongStart", null, vehicleFullDto1.getId(),
-                        category1Id, true, "01.01.2022", "01.01.2025");
+                        category1Id, "PLANNED", "01.01.2022", "01.01.2025");
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.addWork(userFullDto.getId(), startBeforeNowAndIsPlannedDto));
 
         NewWorkDto sameTitleAndStartDate =
                 new NewWorkDto("work1", null, vehicleFullDto1.getId(), category1Id,
-                        true, null, null);
+                        "PLANNED", null, null);
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.addWork(userFullDto.getId(), sameTitleAndStartDate));
     }
@@ -159,7 +159,7 @@ public class WorkIntTest {
 
         //update category and isPlanned and start and end
         assertEquals(category1Id, workToCheckDto.getCategory().getId());
-        assertEquals(true, workToCheckDto.getIsPlanned());
+        assertEquals("PLANNED", workToCheckDto.getStatus());
         assertNull(workToCheckDto.getStartDate());
         assertNull(workToCheckDto.getEndDate());
 
@@ -168,10 +168,10 @@ public class WorkIntTest {
         String endDateString = "02.01.2020";
 
         workUpdateDto = new WorkUpdateDto(
-                null, null, newCategoryId, false, startDateString, endDateString);
+                null, null, newCategoryId, "DONE", startDateString, endDateString);
         workToCheckDto = workController.update(userId, workId, workUpdateDto);
         assertEquals(newCategoryId, workToCheckDto.getCategory().getId());
-        assertEquals(false, workToCheckDto.getIsPlanned());
+        assertNotEquals("PLANNED", workToCheckDto.getStatus());
         assertEquals(startDateString, workToCheckDto.getStartDate());
         assertEquals(endDateString, workToCheckDto.getEndDate());
 
@@ -184,19 +184,19 @@ public class WorkIntTest {
 
         // start before now with isPlanned = true
         WorkUpdateDto startForIsPlanned = new WorkUpdateDto(
-                null, null, null, true, null, null);
+                null, null, null, "PLANNED", null, null);
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.update(userId, workId, startForIsPlanned));
 
         // same Title and StartDate as another work
         NewWorkDto anotherWorkNewDto = new NewWorkDto("anotherTitle", null, vehicleFullDto1.getId(),
-                category1Id, false, startDateString, endDateString);
+                category1Id, null, startDateString, endDateString);
         WorkFullDto anotherWorkFullDto = workController.addWork(userId, anotherWorkNewDto);
         assertEquals(anotherWorkNewDto.getTitle(), anotherWorkFullDto.getTitle());
         assertEquals(anotherWorkNewDto.getStartDate(), anotherWorkFullDto.getStartDate());
 
         WorkUpdateDto sameTitleAndStartDto = new WorkUpdateDto(
-                anotherWorkFullDto.getTitle(), null, null, true, startDateString, null);
+                anotherWorkFullDto.getTitle(), null, null, "PLANNED", startDateString, null);
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.update(userId, workId, sameTitleAndStartDto));
     }
@@ -303,7 +303,7 @@ public class WorkIntTest {
 
         // by is_planned
         workList = workController.getByParams(userId, null, null, null,
-                true, null, null, "id", 0, 10);
+                "PLANNED", null, null, "id", 0, 10);
         assertEquals(2, workList.size());
         assertEquals(work1Id, workList.get(0).getId());
         assertEquals(work3Id, workList.get(1).getId());
@@ -323,7 +323,7 @@ public class WorkIntTest {
 
         // test sort by isPlanned
         workList = workController.getByParams(userId, null, null, null,
-                null, null, null, "is_Planned", 0, 10);
+                null, null, null, "status", 0, 10);
         assertEquals(4, workList.size());
         assertEquals(work2Id, workList.get(0).getId());
         assertEquals(work1Id, workList.get(1).getId());

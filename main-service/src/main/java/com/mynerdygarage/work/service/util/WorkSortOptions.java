@@ -5,7 +5,7 @@ public enum WorkSortOptions {
     ID,
     CATEGORY,
     TITLE,
-    IS_PLANNED,
+    STATUS,
     START_DATE,
     END_DATE
 

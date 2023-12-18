@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryChecker.checkNewCategory(categoryRepository, creatorId, category);
 
-        CategoryFullDto fullDtoToReturn = CategoryMapper.categoryToFullDto(categoryRepository.save(category));
+        CategoryFullDto fullDtoToReturn = CategoryMapper.modelToFullDto(categoryRepository.save(category));
 
         log.info("-- Category has been saved: {}", fullDtoToReturn);
 
@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         CategoryUpdater.update(categoryToUpdate, inputDto);
 
-        CategoryFullDto fullDtoToReturn = CategoryMapper.categoryToFullDto(categoryRepository.save(categoryToUpdate));
+        CategoryFullDto fullDtoToReturn = CategoryMapper.modelToFullDto(categoryRepository.save(categoryToUpdate));
 
         log.info("-- Category has been updated: {}", fullDtoToReturn);
 
@@ -70,7 +70,7 @@ public class CategoryServiceImpl implements CategoryService {
         log.info("-- Getting default categories");
 
         List<CategoryFullDto> listToReturn =
-                CategoryMapper.categoryToFullDto(categoryRepository.findByCreatorId(null));
+                CategoryMapper.modelToFullDto(categoryRepository.findByCreatorId(null));
 
         log.info("-- Default categories list returned, size={}", listToReturn.size());
 
@@ -90,7 +90,7 @@ public class CategoryServiceImpl implements CategoryService {
                 new NotFoundException("- CategoryId not found: " + categoryId));
 
         CategoryFullDto dtoToReturn =
-                CategoryMapper.categoryToFullDto(category);
+                CategoryMapper.modelToFullDto(category);
 
         log.info("-- Category returned:{}", dtoToReturn);
 
@@ -107,7 +107,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         List<CategoryFullDto> listToReturn =
-                CategoryMapper.categoryToFullDto(categoryRepository.findByCreatorId(creatorId));
+                CategoryMapper.modelToFullDto(categoryRepository.findByCreatorId(creatorId));
 
         log.info("-- Custom categories list returned, size={}", listToReturn.size());
 
@@ -124,7 +124,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         List<CategoryFullDto> listToReturn =
-                CategoryMapper.categoryToFullDto(categoryRepository.findAvailableCategoriesByUserId(userId));
+                CategoryMapper.modelToFullDto(categoryRepository.findAvailableCategoriesByUserId(userId));
 
         log.info("-- Available categories list returned, size={}", listToReturn.size());
 

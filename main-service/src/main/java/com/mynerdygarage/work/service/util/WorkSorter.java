@@ -13,8 +13,8 @@ public class WorkSorter {
             sortBy = "category";
         } else if (sortBy.equalsIgnoreCase(WorkSortOptions.TITLE.name())) {
             sortBy = "title";
-        } else if (sortBy.equalsIgnoreCase(WorkSortOptions.IS_PLANNED.name())) {
-            sortBy = "isPlanned";
+        } else if (sortBy.equalsIgnoreCase(WorkSortOptions.STATUS.name())) {
+            sortBy = "status";
         } else if (sortBy.equalsIgnoreCase(WorkSortOptions.START_DATE.name())) {
             sortBy = "startDate";
         } else if (sortBy.equalsIgnoreCase(WorkSortOptions.END_DATE.name())) {

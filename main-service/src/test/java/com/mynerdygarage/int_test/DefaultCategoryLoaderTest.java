@@ -1,6 +1,6 @@
 package com.mynerdygarage.int_test;
 
-import com.mynerdygarage.category.model.dafault.DefaultCategoriesHandler;
+import com.mynerdygarage.category.dafault.DefaultCategoriesHandler;
 import com.mynerdygarage.category.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;

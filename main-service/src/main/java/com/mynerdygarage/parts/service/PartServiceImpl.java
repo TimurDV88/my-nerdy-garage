@@ -1,21 +1,24 @@
-package com.mynerdygarage.work.service;
+package com.mynerdygarage.parts.service;
 
 import com.mynerdygarage.category.model.Category;
 import com.mynerdygarage.category.repository.CategoryRepository;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.IncorrectRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
+import com.mynerdygarage.parts.dto.NewPartDto;
+import com.mynerdygarage.parts.dto.PartFullDto;
+import com.mynerdygarage.parts.dto.PartMapper;
+import com.mynerdygarage.parts.dto.PartUpdateDto;
+import com.mynerdygarage.parts.model.Part;
+import com.mynerdygarage.parts.model.PartStatus;
+import com.mynerdygarage.parts.repository.PartRepository;
+import com.mynerdygarage.parts.service.util.*;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.util.PageRequestCreator;
 import com.mynerdygarage.vehicle.model.Vehicle;
 import com.mynerdygarage.vehicle.repository.VehicleRepository;
-import com.mynerdygarage.work.dto.*;
-import com.mynerdygarage.work.model.Work;
-import com.mynerdygarage.work.model.WorkStatus;
-import com.mynerdygarage.work.repository.WorkRepository;
-import com.mynerdygarage.work.service.util.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,50 +35,52 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class WorkServiceImpl implements WorkService {
+public class PartServiceImpl {
 
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final CategoryRepository categoryRepository;
-    private final WorkRepository workRepository;
+    private final PartRepository partRepository;
 
-    @Override
+
     @Transactional
-    public WorkFullDto addWork(Long userId, NewWorkDto newWorkDto) {
+    public PartFullDto addPart(Long userId, NewPartDto newPartDto) {
 
-        log.info("-- Saving work by user with Id={}: {}", userId, newWorkDto);
+        log.info("-- Saving part by user with Id={}: {}", userId, newPartDto);
 
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("- UserId not found: " + userId));
 
-        Vehicle vehicle = vehicleRepository.findById(newWorkDto.getVehicleId()).orElseThrow(() ->
-                new NotFoundException("- VehicleId not found: " + newWorkDto.getVehicleId()));
+        Vehicle vehicle = vehicleRepository.findById(newPartDto.getVehicleId()).orElseThrow(() ->
+                new NotFoundException("- VehicleId not found: " + newPartDto.getVehicleId()));
 
-        Category category = categoryRepository.findById(newWorkDto.getCategoryId()).orElseThrow(() ->
-                new NotFoundException("- CategoryId not found: " + newWorkDto.getCategoryId()));
+        Category category = categoryRepository.findById(newPartDto.getCategoryId()).orElseThrow(() ->
+                new NotFoundException("- CategoryId not found: " + newPartDto.getCategoryId()));
 
-        Work work = WorkCreator.createFromNewDto(user, vehicle, category, newWorkDto);
+        Part part = PartCreator.createFromNewDto(user, vehicle, category, newPartDto);
 
-        WorkChecker.checkNewWork(workRepository, work);
+        PartChecker.checkNewPart(partRepository, part);
 
-        WorkFullDto fullDtoToReturn = WorkMapper.modelToFullDto(workRepository.save(work));
+        PartFullDto fullDtoToReturn = PartMapper.modelToFullDto(partRepository.save(part));
 
-        log.info("-- Work has been saved: {}", fullDtoToReturn);
+        log.info("-- Part has been saved: {}", fullDtoToReturn);
 
         return fullDtoToReturn;
     }
 
-    @Override
     @Transactional
-    public WorkFullDto update(Long userId, Long workId, WorkUpdateDto inputDto) {
+    public PartFullDto update(Long userId, Long partId, PartUpdateDto inputDto) {
 
-        log.info("-- Updating work by workId={}: {}", workId, inputDto);
+        log.info("-- Updating part by partId={}: {}", partId, inputDto);
 
-        Work workToUpdate = workRepository.findById(workId).orElseThrow(() ->
-                new NotFoundException("- WorkId not found: " + workId));
+        Vehicle vehicle = vehicleRepository.findById(inputDto.getVehicleId()).orElseThrow(() ->
+                new NotFoundException("- VehicleId not found: " + inputDto.getVehicleId()));
 
-        if (!userId.equals(workToUpdate.getUser().getId())) {
-            throw new NotFoundException("- User with Id=" + userId + " is not initiator of work with id=" + workId);
+        Part partToUpdate = partRepository.findById(partId).orElseThrow(() ->
+                new NotFoundException("- partId not found: " + partId));
+
+        if (!userId.equals(partToUpdate.getUser().getId())) {
+            throw new NotFoundException("- User with Id=" + userId + " is not buyer of part with id=" + partId);
         }
 
         Category category;
@@ -83,71 +88,49 @@ public class WorkServiceImpl implements WorkService {
             category = categoryRepository.findById(inputDto.getCategoryId()).orElseThrow(() ->
                     new NotFoundException("- CategoryId not found: " + inputDto.getCategoryId()));
         } else {
-            category = workToUpdate.getCategory();
+            category = partToUpdate.getCategory();
         }
 
-        Work inputWork = WorkCreator.createFromUpdateDto(category, inputDto);
+        Part inputPart = PartCreator.createFromUpdateDto(vehicle, category, inputDto);
 
-        Work updatedWork = WorkUpdater.update(workToUpdate, inputWork);
+        Part updatedPart = PartUpdater.update(partToUpdate, inputPart);
 
-        WorkChecker.checkUpdateWork(workRepository, updatedWork);
+        PartChecker.checkUpdatePart(partRepository, updatedPart);
 
-        WorkFullDto fullDtoToReturn = WorkMapper.modelToFullDto(workRepository.save(updatedWork));
+        PartFullDto fullDtoToReturn = PartMapper.modelToFullDto(partRepository.save(updatedPart));
 
         log.info("-- Work has been updated: {}", fullDtoToReturn);
 
         return fullDtoToReturn;
     }
 
-    @Override
-    public WorkFullDto getById(Long userId, Long workId) {
+    public PartFullDto getById(Long userId, Long partId) {
 
-        log.info("-- Returning work by workId={}", workId);
+        log.info("-- Returning part by partId={}", partId);
 
-        WorkFullDto fullDtoToReturn = WorkMapper.modelToFullDto(workRepository.findById(workId).orElseThrow(() ->
-                new NotFoundException("- WorkId not found: " + workId)));
+        PartFullDto fullDtoToReturn = PartMapper.modelToFullDto(partRepository.findById(partId).orElseThrow(() ->
+                new NotFoundException("- partId not found: " + partId)));
 
-        if (!userId.equals(fullDtoToReturn.getUser().getId())) {
-            throw new NotFoundException("- User with Id=" + userId + " is not initiator of work with id=" + workId);
+        if (!userId.equals(fullDtoToReturn.getUserShortDto().getId())) {
+            throw new NotFoundException("- User with Id=" + userId + " is not buyer of part with id=" + partId);
         }
 
-        log.info("-- Work returned: {}", fullDtoToReturn);
+        log.info("-- Part returned: {}", fullDtoToReturn);
 
         return fullDtoToReturn;
     }
 
-    @Override
-    public List<WorkShortDto> getByVehicleId(Long userId, Long vehicleId, String sortBy, int from, int size) {
-
-        log.info("-- Returning works list by vehicleId={}", vehicleId);
-
-        if (!vehicleRepository.existsByOwnerIdAndId(userId, vehicleId)) {
-            throw new NotFoundException("- User with id=" + userId + " does not own vehicle with id=" + vehicleId);
-        }
-
-        Sort sort = WorkSorter.createSort(sortBy);
-        PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
-
-        Iterable<Work> foundWorks = workRepository.findByVehicleId(vehicleId, pageRequest);
-
-        List<WorkShortDto> listToReturn = WorkMapper.modelToShortDto(foundWorks);
-
-        log.info("-- Work list for vehicleId={} returned, size={}", vehicleId, listToReturn.size());
-
-        return listToReturn;
-    }
-
-    @Override
-    public List<WorkFullDto> getByParams(Long userId,
+    public List<PartFullDto> getByParams(Long userId,
                                          String text,
                                          Long[] vehicleIds,
                                          Long[] categoryIds,
+                                         Boolean isReusable,
                                          String status,
                                          String start,
                                          String end,
                                          String sortBy, int from, int size) {
 
-        log.info("-- Returning works list by parameters: text={}, vehicleIds={}, categoryIds={}, status={}, " +
+        log.info("-- Returning part list by parameters: text={}, vehicleIds={}, categoryIds={}, status={}, " +
                         "startFromDate={}, endByDate={}, sort={}",
                 text, vehicleIds, categoryIds, status, start, end, sortBy);
 
@@ -197,9 +180,9 @@ public class WorkServiceImpl implements WorkService {
 
         //status
         if (status != null &&
-                !Arrays.stream(WorkStatus.values()).map(Enum::name).toList().contains(status)) {
+                !Arrays.stream(PartStatus.values()).map(Enum::name).toList().contains(status)) {
 
-            throw new ConflictOnRequestException("- Incorrect work status");
+            throw new ConflictOnRequestException("- Incorrect part status");
         }
 
         //start and end
@@ -211,31 +194,18 @@ public class WorkServiceImpl implements WorkService {
         //end of checks
 
         BooleanExpression byParameters =
-                WorkQueryCreator.createBooleanExpression(
-                        userId, text, vehicleIds, categoryIds, status, startDate, endDate);
+                PartQueryCreator.createBooleanExpression(
+                        userId, text, vehicleIds, categoryIds, isReusable, status, startDate, endDate);
 
-        Sort sort = WorkSorter.createSort(sortBy);
+        Sort sort = PartSorter.createSort(sortBy);
         PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
 
-        Iterable<Work> foundWorks = workRepository.findAll(byParameters, pageRequest);
+        Iterable<Part> foundParts = partRepository.findAll(byParameters, pageRequest);
 
-        List<WorkFullDto> listToReturn = WorkMapper.modelToFullDto(foundWorks);
+        List<PartFullDto> listToReturn = PartMapper.modelToFullDto(foundParts);
 
         log.info("-- Works list by parameters returned, size={}", listToReturn.size());
 
         return listToReturn;
-    }
-
-    @Override
-    @Transactional
-    public void removeById(Long userId, Long workId) {
-
-        log.info("--- Deleting work by workId={}", workId);
-
-        WorkFullDto dtoToShowInLog = getById(userId, workId);
-
-        workRepository.deleteById(workId);
-
-        log.info("--- Work deleted: {}", dtoToShowInLog);
     }
 }

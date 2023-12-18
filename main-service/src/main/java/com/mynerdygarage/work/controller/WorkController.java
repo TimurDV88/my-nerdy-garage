@@ -59,7 +59,7 @@ public class WorkController {
                                          @RequestParam(value = "searchText", required = false) String text,
                                          @RequestParam(value = "vehicleIds", required = false) Long[] vehicleIds,
                                          @RequestParam(value = "categoryIds", required = false) Long[] categoryIds,
-                                         @RequestParam(value = "isPlanned", required = false) Boolean isPlanned,
+                                         @RequestParam(value = "status", required = false) String status,
                                          @RequestParam(value = "start", required = false) String start,
                                          @RequestParam(value = "end", required = false) String end,
                                          @RequestParam(value = "sortBy", required = false,
@@ -68,7 +68,7 @@ public class WorkController {
                                          @RequestParam(value = "size", defaultValue = "10") int size) {
 
         return workService.getByParams(
-                userId, text, vehicleIds, categoryIds, isPlanned, start, end, sortBy, from, size);
+                userId, text, vehicleIds, categoryIds, status, start, end, sortBy, from, size);
     }
 
     @DeleteMapping("/{workId}")

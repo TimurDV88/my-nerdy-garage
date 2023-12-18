@@ -1,4 +1,4 @@
-package com.mynerdygarage.category.model.dafault;
+package com.mynerdygarage.category.dafault;
 
 import com.mynerdygarage.category.model.Category;
 

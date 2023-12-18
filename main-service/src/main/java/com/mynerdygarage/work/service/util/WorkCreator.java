@@ -19,7 +19,7 @@ public class WorkCreator {
         work.setCategory(category);
         work.setTitle(newWorkDto.getTitle());
         work.setDescription(newWorkDto.getDescription());
-        work.setIsPlanned(newWorkDto.getIsPlanned());
+        work.setStatus(newWorkDto.getStatus());
         work.setStartDate(CustomFormatter.stringToDate(newWorkDto.getStartDate()));
         work.setEndDate(CustomFormatter.stringToDate(newWorkDto.getEndDate()));
 
@@ -33,7 +33,7 @@ public class WorkCreator {
         work.setCategory(category);
         work.setTitle(workUpdateDto.getTitle());
         work.setDescription(workUpdateDto.getDescription());
-        work.setIsPlanned(workUpdateDto.getIsPlanned());
+        work.setStatus(workUpdateDto.getStatus());
         work.setStartDate(CustomFormatter.stringToDate(workUpdateDto.getStartDate()));
         work.setEndDate(CustomFormatter.stringToDate(workUpdateDto.getEndDate()));
 

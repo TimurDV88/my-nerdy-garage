@@ -8,38 +8,38 @@ import java.util.List;
 
 public class CategoryMapper {
 
-    public static CategoryFullDto categoryToFullDto(Category category) {
+    public static CategoryFullDto modelToFullDto(Category category) {
 
         return new CategoryFullDto(
                 category.getId(),
                 category.getName(),
                 category.getDescription(),
-                UserMapper.userToShortDto(category.getCreator())
+                UserMapper.modelToShortDto(category.getCreator())
         );
     }
 
-    public static List<CategoryFullDto> categoryToFullDto(Iterable<Category> categories) {
+    public static List<CategoryFullDto> modelToFullDto(Iterable<Category> categories) {
 
         List<CategoryFullDto> toReturn = new ArrayList<>();
 
         for (Category category : categories) {
-            toReturn.add(categoryToFullDto(category));
+            toReturn.add(modelToFullDto(category));
         }
 
         return toReturn;
     }
 
-    public static CategoryShortDto categoryToShortDto(Category category) {
+    public static CategoryShortDto modelToShortDto(Category category) {
 
         return new CategoryShortDto(category.getId(), category.getName());
     }
 
-    public static List<CategoryShortDto> categoryToShortDto(Iterable<Category> categories) {
+    public static List<CategoryShortDto> modelToShortDto(Iterable<Category> categories) {
 
         List<CategoryShortDto> toReturn = new ArrayList<>();
 
         for (Category category : categories) {
-            toReturn.add(categoryToShortDto(category));
+            toReturn.add(modelToShortDto(category));
         }
 
         return toReturn;

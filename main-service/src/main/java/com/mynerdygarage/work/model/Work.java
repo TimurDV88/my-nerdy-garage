@@ -41,8 +41,8 @@ public class Work {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "is_planned")
-    private Boolean isPlanned;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "start_date")
     private LocalDate startDate;

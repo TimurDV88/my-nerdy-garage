@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS works (
     title           VARCHAR(255) NOT NULL,
     description     VARCHAR(255),
 
-    is_planned      Boolean NOT NULL,
+    status          VARCHAR(255),
     start_date      TIMESTAMP,
     end_date        TIMESTAMP,
 
@@ -107,7 +107,6 @@ CREATE TABLE IF NOT EXISTS parts (
     description     VARCHAR(255),
     is_reusable     Boolean NOT NULL,
     status          VARCHAR(255),
-    is_planned      Boolean NOT NULL,
     order_date      TIMESTAMP,
     delivery_date   TIMESTAMP,
 
