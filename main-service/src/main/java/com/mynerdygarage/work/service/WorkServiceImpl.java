@@ -3,12 +3,12 @@ package com.mynerdygarage.work.service;
 import com.mynerdygarage.category.model.Category;
 import com.mynerdygarage.category.repository.CategoryRepository;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
-import com.mynerdygarage.error.exception.IncorrectRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.util.PageRequestCreator;
+import com.mynerdygarage.util.RequestParamsChecker;
 import com.mynerdygarage.vehicle.model.Vehicle;
 import com.mynerdygarage.vehicle.repository.VehicleRepository;
 import com.mynerdygarage.work.dto.*;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -108,7 +107,8 @@ public class WorkServiceImpl implements WorkService {
                 new NotFoundException("- WorkId not found: " + workId)));
 
         if (!userId.equals(fullDtoToReturn.getUser().getId())) {
-            throw new NotFoundException("- User with Id=" + userId + " is not initiator of work with id=" + workId);
+            throw new ConflictOnRequestException(
+                    "- User with Id=" + userId + " is not initiator of work with id=" + workId);
         }
 
         log.info("-- Work returned: {}", fullDtoToReturn);
@@ -122,7 +122,8 @@ public class WorkServiceImpl implements WorkService {
         log.info("-- Returning works list by vehicleId={}", vehicleId);
 
         if (!vehicleRepository.existsByOwnerIdAndId(userId, vehicleId)) {
-            throw new NotFoundException("- User with id=" + userId + " does not own vehicle with id=" + vehicleId);
+            throw new ConflictOnRequestException(
+                    "- User with id=" + userId + " does not own vehicle with id=" + vehicleId);
         }
 
         Sort sort = WorkSorter.createSort(sortBy);
@@ -151,64 +152,31 @@ public class WorkServiceImpl implements WorkService {
                         "startFromDate={}, endByDate={}, sort={}",
                 text, vehicleIds, categoryIds, status, start, end, sortBy);
 
-        // checks:
+        // - checks:
+        RequestParamsChecker requestParamsChecker = new RequestParamsChecker(vehicleRepository, categoryRepository);
+
         // text
-        if (text != null && (text.isBlank() || text.length() < 2)) {
-            text = null;
-        }
+        text = requestParamsChecker.checkAndReturnText(text);
 
         // vehicleIds
-        if (vehicleIds != null) {
-
-            List<Long> existedVehicleIds = vehicleRepository.findIdsByOwnerId(userId);
-            List<Long> properVehicleIds = new ArrayList<>();
-
-            for (Long inputVehicleId : vehicleIds) {
-                if (existedVehicleIds.contains(inputVehicleId)) {
-                    properVehicleIds.add(inputVehicleId);
-                }
-            }
-
-            if (!properVehicleIds.isEmpty()) {
-                vehicleIds = properVehicleIds.toArray(new Long[0]);
-            } else {
-                vehicleIds = null;
-            }
-        }
+        vehicleIds = requestParamsChecker.checkAndReturnVehicleIds(userId, vehicleIds);
 
         // categoryIds
-        if (categoryIds != null) {
+        categoryIds = requestParamsChecker.checkAndReturnCategoryIds(userId, categoryIds);
 
-            List<Long> existedCategoryIds = categoryRepository.findAvailableIdsByCreatorId(userId);
-            List<Long> properCategoryIds = new ArrayList<>();
-
-            for (Long inputCategoryId : categoryIds) {
-                if (existedCategoryIds.contains(inputCategoryId)) {
-                    properCategoryIds.add(inputCategoryId);
-                }
-            }
-
-            if (!properCategoryIds.isEmpty()) {
-                categoryIds = properCategoryIds.toArray(new Long[0]);
-            } else {
-                categoryIds = null;
-            }
-        }
-
-        //status
+        // status
         if (status != null &&
                 !Arrays.stream(WorkStatus.values()).map(Enum::name).toList().contains(status)) {
 
             throw new ConflictOnRequestException("- Incorrect work status");
         }
 
-        //start and end
+        // start and end
         LocalDate startDate = CustomFormatter.stringToDate(start);
         LocalDate endDate = CustomFormatter.stringToDate(end);
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            throw new IncorrectRequestException("- start cannot be after end");
-        }
-        //end of checks
+        requestParamsChecker.checkStartAndEnd(startDate, endDate);
+
+        // - end of checks
 
         BooleanExpression byParameters =
                 WorkQueryCreator.createBooleanExpression(

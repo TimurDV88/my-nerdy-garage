@@ -3,7 +3,6 @@ package com.mynerdygarage.parts.service;
 import com.mynerdygarage.category.model.Category;
 import com.mynerdygarage.category.repository.CategoryRepository;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
-import com.mynerdygarage.error.exception.IncorrectRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.parts.dto.NewPartDto;
 import com.mynerdygarage.parts.dto.PartFullDto;
@@ -17,6 +16,7 @@ import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.util.PageRequestCreator;
+import com.mynerdygarage.util.RequestParamsChecker;
 import com.mynerdygarage.vehicle.model.Vehicle;
 import com.mynerdygarage.vehicle.repository.VehicleRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,7 +40,6 @@ public class PartServiceImpl {
     private final VehicleRepository vehicleRepository;
     private final CategoryRepository categoryRepository;
     private final PartRepository partRepository;
-
 
     @Transactional
     public PartFullDto addPart(Long userId, NewPartDto newPartDto) {
@@ -80,7 +78,8 @@ public class PartServiceImpl {
                 new NotFoundException("- partId not found: " + partId));
 
         if (!userId.equals(partToUpdate.getUser().getId())) {
-            throw new NotFoundException("- User with Id=" + userId + " is not buyer of part with id=" + partId);
+            throw new ConflictOnRequestException(
+                    "- User with Id=" + userId + " is not buyer of part with id=" + partId);
         }
 
         Category category;
@@ -104,6 +103,7 @@ public class PartServiceImpl {
         return fullDtoToReturn;
     }
 
+
     public PartFullDto getById(Long userId, Long partId) {
 
         log.info("-- Returning part by partId={}", partId);
@@ -112,7 +112,8 @@ public class PartServiceImpl {
                 new NotFoundException("- partId not found: " + partId)));
 
         if (!userId.equals(fullDtoToReturn.getUserShortDto().getId())) {
-            throw new NotFoundException("- User with Id=" + userId + " is not buyer of part with id=" + partId);
+            throw new ConflictOnRequestException(
+                    "- User with Id=" + userId + " is not buyer of part with id=" + partId);
         }
 
         log.info("-- Part returned: {}", fullDtoToReturn);
@@ -134,64 +135,31 @@ public class PartServiceImpl {
                         "startFromDate={}, endByDate={}, sort={}",
                 text, vehicleIds, categoryIds, status, start, end, sortBy);
 
-        // checks:
+        // - checks:
+        RequestParamsChecker requestParamsChecker = new RequestParamsChecker(vehicleRepository, categoryRepository);
+
         // text
-        if (text != null && (text.isBlank() || text.length() < 2)) {
-            text = null;
-        }
+        text = requestParamsChecker.checkAndReturnText(text);
 
         // vehicleIds
-        if (vehicleIds != null) {
-
-            List<Long> existedVehicleIds = vehicleRepository.findIdsByOwnerId(userId);
-            List<Long> properVehicleIds = new ArrayList<>();
-
-            for (Long inputVehicleId : vehicleIds) {
-                if (existedVehicleIds.contains(inputVehicleId)) {
-                    properVehicleIds.add(inputVehicleId);
-                }
-            }
-
-            if (!properVehicleIds.isEmpty()) {
-                vehicleIds = properVehicleIds.toArray(new Long[0]);
-            } else {
-                vehicleIds = null;
-            }
-        }
+        vehicleIds = requestParamsChecker.checkAndReturnVehicleIds(userId, vehicleIds);
 
         // categoryIds
-        if (categoryIds != null) {
+        categoryIds = requestParamsChecker.checkAndReturnCategoryIds(userId, categoryIds);
 
-            List<Long> existedCategoryIds = categoryRepository.findAvailableIdsByCreatorId(userId);
-            List<Long> properCategoryIds = new ArrayList<>();
-
-            for (Long inputCategoryId : categoryIds) {
-                if (existedCategoryIds.contains(inputCategoryId)) {
-                    properCategoryIds.add(inputCategoryId);
-                }
-            }
-
-            if (!properCategoryIds.isEmpty()) {
-                categoryIds = properCategoryIds.toArray(new Long[0]);
-            } else {
-                categoryIds = null;
-            }
-        }
-
-        //status
+        // status
         if (status != null &&
                 !Arrays.stream(PartStatus.values()).map(Enum::name).toList().contains(status)) {
 
             throw new ConflictOnRequestException("- Incorrect part status");
         }
 
-        //start and end
+        // start and end
         LocalDate startDate = CustomFormatter.stringToDate(start);
         LocalDate endDate = CustomFormatter.stringToDate(end);
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            throw new IncorrectRequestException("- start cannot be after end");
-        }
-        //end of checks
+        requestParamsChecker.checkStartAndEnd(startDate, endDate);
+
+        // - end of checks
 
         BooleanExpression byParameters =
                 PartQueryCreator.createBooleanExpression(

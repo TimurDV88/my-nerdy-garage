@@ -77,7 +77,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleFullDto getById(Long ownerId, Long vehicleId) {
 
-        log.info("-- Getting vehicle by vehicleId={}", vehicleId);
+        log.info("-- Returning vehicle by vehicleId={}", vehicleId);
 
         if (!userRepository.existsById(ownerId)) {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
@@ -95,7 +95,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<VehicleShortDto> getByOwnerId(Long ownerId, int from, int size) {
 
-        log.info("-- Getting vehicles by ownerId={}", ownerId);
+        log.info("-- Returning vehicles by ownerId={}", ownerId);
 
         if (!userRepository.existsById(ownerId)) {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
