@@ -130,7 +130,7 @@ public class PartServiceImpl {
                                          String end,
                                          String sortBy, int from, int size) {
 
-        log.info("-- Returning part list by parameters: text={}, vehicleIds={}, categoryIds={}, status={}, " +
+        log.info("-- Returning parts list by parameters: text={}, vehicleIds={}, categoryIds={}, status={}, " +
                         "startFromDate={}, endByDate={}, sort={}",
                 text, vehicleIds, categoryIds, status, start, end, sortBy);
 
