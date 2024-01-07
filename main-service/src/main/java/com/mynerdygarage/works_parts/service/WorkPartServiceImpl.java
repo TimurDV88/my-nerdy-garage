@@ -6,6 +6,9 @@ import com.mynerdygarage.parts.dto.PartMapper;
 import com.mynerdygarage.parts.dto.PartShortDto;
 import com.mynerdygarage.parts.model.Part;
 import com.mynerdygarage.parts.repository.PartRepository;
+import com.mynerdygarage.util.PageRequestCreator;
+import com.mynerdygarage.work.dto.WorkMapper;
+import com.mynerdygarage.work.dto.WorkShortDto;
 import com.mynerdygarage.work.model.Work;
 import com.mynerdygarage.work.repository.WorkRepository;
 import com.mynerdygarage.works_parts.model.WorkPart;
@@ -13,6 +16,8 @@ import com.mynerdygarage.works_parts.model.WorkPartId;
 import com.mynerdygarage.works_parts.repository.WorkPartRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +42,7 @@ public class WorkPartServiceImpl implements WorkPartService {
         Part part = partRepository.findById(partId).orElseThrow(() ->
                 new NotFoundException("- partId not found: " + partId));
 
-        if (!userId.equals(part.getUser().getId())) {
+        if (!userId.equals(part.getOwner().getId())) {
             throw new ConflictOnRequestException(
                     "- User with Id=" + userId + " is not buyer of part with id=" + partId);
         }
@@ -45,7 +50,7 @@ public class WorkPartServiceImpl implements WorkPartService {
         Work work = workRepository.findById(workId).orElseThrow(() ->
                 new NotFoundException("- workId not found: " + workId));
 
-        if (!userId.equals(work.getUser().getId())) {
+        if (!userId.equals(work.getInitiator().getId())) {
             throw new ConflictOnRequestException(
                     "- User with Id=" + userId + " is not initiator of work with id=" + work);
         }
@@ -68,21 +73,26 @@ public class WorkPartServiceImpl implements WorkPartService {
     }
 
     @Override
-    public List<PartShortDto> getPartsByWorkId(Long userId, Long workId) {
+    public List<PartShortDto> getPartsByWorkId(Long userId, Long workId, int from, int size) {
 
         log.info("-- Returning parts by workId={}", workId);
 
         Work work = workRepository.findById(workId).orElseThrow(() ->
                 new NotFoundException("- workId not found: " + workId));
 
-        if (!userId.equals(work.getUser().getId())) {
+        if (!userId.equals(work.getInitiator().getId())) {
             throw new ConflictOnRequestException(
                     "- User with Id=" + userId + " is not initiator of work with id=" + work);
         }
 
+        Sort sort = Sort.by("start_date").and(Sort.by("id"));
+        PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
+
+        Iterable<WorkPart> foundWorkParts = workPartRepository.findByWorkPartIdWorkId(workId, pageRequest);
+
         List<PartShortDto> foundParts = new ArrayList<>();
 
-        for (WorkPart workPart : workPartRepository.findByWorkPartIdWorkId(workId)) {
+        for (WorkPart workPart : foundWorkParts) {
 
             foundParts.add(PartMapper.modelToShortDto(workPart.getPart()));
         }
@@ -90,6 +100,36 @@ public class WorkPartServiceImpl implements WorkPartService {
         log.info("-- List of parts by workId={} returned, size={}", workId, foundParts.size());
 
         return foundParts;
+    }
+
+    @Override
+    public List<WorkShortDto> getWorksByPartId(Long userId, Long partId, int from, int size) {
+
+        log.info("-- Returning works by partId={}", partId);
+
+        Part part = partRepository.findById(partId).orElseThrow(() ->
+                new NotFoundException("- partId not found: " + partId));
+
+        if (!userId.equals(part.getOwner().getId())) {
+            throw new ConflictOnRequestException(
+                    "- User with Id=" + userId + " is not owner of part with id=" + part);
+        }
+
+        Sort sort = Sort.by("name").and(Sort.by("id"));
+        PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
+
+        Iterable<WorkPart> foundWorkParts = workPartRepository.findByWorkPartIdPartId(partId, pageRequest);
+
+        List<WorkShortDto> foundWorks = new ArrayList<>();
+
+        for (WorkPart workPart : foundWorkParts) {
+
+            foundWorks.add(WorkMapper.modelToShortDto(workPart.getWork()));
+        }
+
+        log.info("-- List of parts by partId={} returned, size={}", partId, foundWorks.size());
+
+        return foundWorks;
     }
 
     @Transactional
@@ -104,14 +144,14 @@ public class WorkPartServiceImpl implements WorkPartService {
 
         Part part = workPartToRemove.getPart();
 
-        if (!userId.equals(part.getUser().getId())) {
+        if (!userId.equals(part.getOwner().getId())) {
             throw new ConflictOnRequestException(
                     "- User with Id=" + userId + " is not buyer of part with id=" + partId);
         }
 
         Work work = workPartToRemove.getWork();
 
-        if (!userId.equals(work.getUser().getId())) {
+        if (!userId.equals(work.getInitiator().getId())) {
             throw new ConflictOnRequestException(
                     "- User with Id=" + userId + " is not initiator of work with id=" + work);
         }

@@ -16,7 +16,7 @@ public class PartMapper {
         return new PartFullDto(
 
                 part.getId(),
-                UserMapper.modelToShortDto(part.getUser()),
+                UserMapper.modelToShortDto(part.getOwner()),
                 VehicleMapper.modelToShortDto(part.getVehicle()),
                 CategoryMapper.modelToShortDto(part.getCategory()),
                 part.getPartNumber(),

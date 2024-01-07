@@ -14,7 +14,7 @@ public class PartCreator {
 
         Part part = new Part();
 
-        part.setUser(user);
+        part.setOwner(user);
         part.setVehicle(vehicle);
         part.setCategory(category);
         part.setPartNumber(newPartDto.getPartNumber());

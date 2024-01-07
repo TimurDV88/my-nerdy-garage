@@ -15,7 +15,7 @@ public class WorkMapper {
 
         return new WorkFullDto(
                 work.getId(),
-                UserMapper.modelToShortDto(work.getUser()),
+                UserMapper.modelToShortDto(work.getInitiator()),
                 VehicleMapper.modelToShortDto(work.getVehicle()),
                 CategoryMapper.modelToShortDto(work.getCategory()),
                 work.getTitle(),
@@ -41,7 +41,7 @@ public class WorkMapper {
 
         return new WorkShortDto(
                 work.getId(),
-                UserMapper.modelToShortDto(work.getUser()),
+                UserMapper.modelToShortDto(work.getInitiator()),
                 VehicleMapper.modelToShortDto(work.getVehicle()),
                 CategoryMapper.modelToShortDto(work.getCategory()),
                 work.getTitle(),

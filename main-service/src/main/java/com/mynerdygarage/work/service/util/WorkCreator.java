@@ -14,7 +14,7 @@ public class WorkCreator {
 
         Work work = new Work();
 
-        work.setUser(user);
+        work.setInitiator(user);
         work.setVehicle(vehicle);
         work.setCategory(category);
         work.setTitle(newWorkDto.getTitle());

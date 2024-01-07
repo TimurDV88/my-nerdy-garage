@@ -34,7 +34,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PartServiceImpl {
+public class PartServiceImpl implements PartService {
 
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
@@ -42,6 +42,7 @@ public class PartServiceImpl {
     private final PartRepository partRepository;
 
     @Transactional
+    @Override
     public PartFullDto addPart(Long userId, NewPartDto newPartDto) {
 
         log.info("-- Saving part by user with Id={}: {}", userId, newPartDto);
@@ -67,6 +68,7 @@ public class PartServiceImpl {
     }
 
     @Transactional
+    @Override
     public PartFullDto update(Long userId, Long partId, PartUpdateDto inputDto) {
 
         log.info("-- Updating part by partId={}: {}", partId, inputDto);
@@ -77,7 +79,7 @@ public class PartServiceImpl {
         Part partToUpdate = partRepository.findById(partId).orElseThrow(() ->
                 new NotFoundException("- partId not found: " + partId));
 
-        if (!userId.equals(partToUpdate.getUser().getId())) {
+        if (!userId.equals(partToUpdate.getOwner().getId())) {
             throw new ConflictOnRequestException(
                     "- User with Id=" + userId + " is not buyer of part with id=" + partId);
         }
@@ -103,7 +105,7 @@ public class PartServiceImpl {
         return fullDtoToReturn;
     }
 
-
+    @Override
     public PartFullDto getById(Long userId, Long partId) {
 
         log.info("-- Returning part by partId={}", partId);
@@ -121,6 +123,7 @@ public class PartServiceImpl {
         return fullDtoToReturn;
     }
 
+    @Override
     public List<PartFullDto> getByParams(Long userId,
                                          String text,
                                          Long[] vehicleIds,
@@ -175,5 +178,18 @@ public class PartServiceImpl {
         log.info("-- Works list by parameters returned, size={}", listToReturn.size());
 
         return listToReturn;
+    }
+
+    @Transactional
+    @Override
+    public void removeById(Long userId, Long partId) {
+
+        log.info("--- Deleting part by partId={}", partId);
+
+        PartFullDto dtoToShowInLog = getById(userId, partId);
+
+        partRepository.deleteById(partId);
+
+        log.info("--- Part deleted: {}", dtoToShowInLog);
     }
 }

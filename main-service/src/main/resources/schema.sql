@@ -133,7 +133,7 @@ CREATE TABLE IF NOT EXISTS works_parts (
     work_id             BIGINT NOT NULL, -- fk
     part_id             BIGINT NOT NULL, -- fk
 
-	CONSTRAINT  pk_works_parts PRIMARY KEY (work_id, part_id),
+	CONSTRAINT  pk_works_parts PRIMARY KEY (work_id, part_id), -- composite key
 
     CONSTRAINT  fk_work_id
         FOREIGN KEY (work_id)

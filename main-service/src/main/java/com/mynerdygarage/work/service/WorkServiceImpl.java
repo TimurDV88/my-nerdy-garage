@@ -73,7 +73,7 @@ public class WorkServiceImpl implements WorkService {
         Work workToUpdate = workRepository.findById(workId).orElseThrow(() ->
                 new NotFoundException("- WorkId not found: " + workId));
 
-        if (!userId.equals(workToUpdate.getUser().getId())) {
+        if (!userId.equals(workToUpdate.getInitiator().getId())) {
             throw new NotFoundException("- User with Id=" + userId + " is not initiator of work with id=" + workId);
         }
 
