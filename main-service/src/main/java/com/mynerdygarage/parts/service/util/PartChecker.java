@@ -49,7 +49,7 @@ public class PartChecker {
         Long userId = newPartToCheck.getOwner().getId();
 
         Part foundPart =
-                partRepository.findByUserIdAndOrderDateAndPartNumberIgnoreCase(
+                partRepository.findByOwnerIdAndOrderDateAndPartNumberIgnoreCase(
                         userId, newPartToCheck.getOrderDate(), newPartToCheck.getPartNumber());
 
         if (foundPart != null) {
@@ -64,7 +64,7 @@ public class PartChecker {
         Long userId = updatePartToCheck.getOwner().getId();
 
         Part foundPart =
-                partRepository.findByUserIdAndOrderDateAndPartNumberIgnoreCase(
+                partRepository.findByOwnerIdAndOrderDateAndPartNumberIgnoreCase(
                         userId, updatePartToCheck.getOrderDate(), updatePartToCheck.getPartNumber());
 
         if (!foundPart.getId().equals(updatePartToCheck.getId())) {

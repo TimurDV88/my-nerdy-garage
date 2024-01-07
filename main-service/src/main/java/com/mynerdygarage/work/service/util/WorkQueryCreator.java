@@ -16,7 +16,7 @@ public class WorkQueryCreator {
                                                             LocalDate end) {
 
         //userId
-        BooleanExpression byUserId = QWork.work.user.id.eq(userId);
+        BooleanExpression byUserId = QWork.work.initiator.id.eq(userId);
 
         //text
         BooleanExpression byText = null;

@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name="works_parts")
+@Table(name = "works_parts")
 @Getter
 @Setter
 @ToString

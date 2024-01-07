@@ -10,5 +10,5 @@ import java.time.LocalDate;
 @Repository
 public interface PartRepository extends JpaRepository<Part, Long>, QuerydslPredicateExecutor<Part> {
 
-    Part findByUserIdAndOrderDateAndPartNumberIgnoreCase(Long userId, LocalDate orderDate, String partNumber);
+    Part findByOwnerIdAndOrderDateAndPartNumberIgnoreCase(Long userId, LocalDate orderDate, String partNumber);
 }

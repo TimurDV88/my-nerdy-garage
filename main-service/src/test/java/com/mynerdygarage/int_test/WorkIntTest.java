@@ -253,7 +253,7 @@ public class WorkIntTest {
         assertEquals(addedWork3.getTitle(), listOfWorks.get(1).getTitle());
 
         // check wrong vehicle id
-        assertThrows(NotFoundException.class,
+        assertThrows(ConflictOnRequestException.class,
                 () -> workController.getByVehicleId(userId, 999L, "id", 0, 10));
     }
 

@@ -17,7 +17,7 @@ public class PartQueryCreator {
                                                             LocalDate endDate) {
 
         //userId
-        BooleanExpression byUserId = QPart.part.user.id.eq(userId);
+        BooleanExpression byUserId = QPart.part.owner.id.eq(userId);
 
         //text
         BooleanExpression byText = null;
