@@ -1,9 +1,13 @@
 package com.mynerdygarage.int_test;
 
 import com.mynerdygarage.category.controller.CategoryController;
+import com.mynerdygarage.category.dto.CategoryFullDto;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.IncorrectRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
+import com.mynerdygarage.parts.controller.PartController;
+import com.mynerdygarage.parts.dto.NewPartDto;
+import com.mynerdygarage.parts.dto.PartFullDto;
 import com.mynerdygarage.user.controller.UserController;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
@@ -21,16 +25,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test-h2")
 @Transactional
-@SpringBootTest(
-        properties = "db.name=test",
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class WorkIntTest {
 
@@ -38,6 +42,7 @@ public class WorkIntTest {
     private final VehicleController vehicleController;
     private final CategoryController categoryController;
     private final WorkController workController;
+    private final PartController partController;
 
     private VehicleFullDto vehicleFullDto1;
     private VehicleFullDto vehicleFullDto2;
@@ -90,19 +95,21 @@ public class WorkIntTest {
         );
         vehicleFullDto2 = vehicleController.addVehicle(userFullDto.getId(), anotherNewVehicleDto);
 
-        category1Id = categoryController.getDefaultCategories(userFullDto.getId()).get(0).getId();
-        category2Id = categoryController.getDefaultCategories(userFullDto.getId()).get(1).getId();
-        category3Id = categoryController.getDefaultCategories(userFullDto.getId()).get(2).getId();
-        category4Id = categoryController.getDefaultCategories(userFullDto.getId()).get(3).getId();
+        List<CategoryFullDto> categoryList = categoryController.getDefaultCategories(userFullDto.getId());
+
+        category1Id = categoryList.get(0).getId();
+        category2Id = categoryList.get(1).getId();
+        category3Id = categoryList.get(2).getId();
+        category4Id = categoryList.get(3).getId();
 
         newWorkDto1 = new NewWorkDto("work1", "descr1", vehicleFullDto1.getId(), category1Id,
-                true, null, null);
+                "PLANNED", null, null);
         newWorkDto2 = new NewWorkDto("work2", "descr2", vehicleFullDto1.getId(), category2Id,
-                false, "01.01.2020", "05.01.2020");
+                null, "01.01.2020", "05.01.2020");
         newWorkDto3 = new NewWorkDto("work3", "descr3", vehicleFullDto2.getId(), category3Id,
-                true, "01.01.2025", "05.01.2025");
+                "PLANNED", "01.01.2025", "05.01.2025");
         newWorkDto4 = new NewWorkDto("work4", "descr4", vehicleFullDto2.getId(), category4Id,
-                false, "01.01.2021", "05.01.2021");
+                null, "01.01.2021", "05.01.2021");
     }
 
     @Test
@@ -114,25 +121,25 @@ public class WorkIntTest {
         assertEquals(newWorkDto1.getDescription(), workToCheck.getDescription());
         assertEquals(newWorkDto1.getVehicleId(), workToCheck.getVehicle().getId());
         assertEquals(newWorkDto1.getCategoryId(), workToCheck.getCategory().getId());
-        assertEquals(newWorkDto1.getIsPlanned(), workToCheck.getIsPlanned());
+        assertEquals(newWorkDto1.getStatus(), workToCheck.getStatus());
         assertEquals(newWorkDto1.getStartDate(), workToCheck.getStartDate());
         assertEquals(newWorkDto1.getEndDate(), workToCheck.getEndDate());
 
         //check errors
         NewWorkDto startBeforeEndDto = new NewWorkDto("wrongStart", null, vehicleFullDto1.getId(),
-                category1Id, false, "01.01.2022", "01.01.2021");
+                category1Id, null, "01.01.2022", "01.01.2021");
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.addWork(userFullDto.getId(), startBeforeEndDto));
 
         NewWorkDto startBeforeNowAndIsPlannedDto =
                 new NewWorkDto("wrongStart", null, vehicleFullDto1.getId(),
-                        category1Id, true, "01.01.2022", "01.01.2025");
+                        category1Id, "PLANNED", "01.01.2022", "01.01.2025");
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.addWork(userFullDto.getId(), startBeforeNowAndIsPlannedDto));
 
         NewWorkDto sameTitleAndStartDate =
                 new NewWorkDto("work1", null, vehicleFullDto1.getId(), category1Id,
-                        true, null, null);
+                        "PLANNED", null, null);
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.addWork(userFullDto.getId(), sameTitleAndStartDate));
     }
@@ -156,7 +163,7 @@ public class WorkIntTest {
 
         //update category and isPlanned and start and end
         assertEquals(category1Id, workToCheckDto.getCategory().getId());
-        assertEquals(true, workToCheckDto.getIsPlanned());
+        assertEquals("PLANNED", workToCheckDto.getStatus());
         assertNull(workToCheckDto.getStartDate());
         assertNull(workToCheckDto.getEndDate());
 
@@ -165,10 +172,10 @@ public class WorkIntTest {
         String endDateString = "02.01.2020";
 
         workUpdateDto = new WorkUpdateDto(
-                null, null, newCategoryId, false, startDateString, endDateString);
+                null, null, newCategoryId, "DONE", startDateString, endDateString);
         workToCheckDto = workController.update(userId, workId, workUpdateDto);
         assertEquals(newCategoryId, workToCheckDto.getCategory().getId());
-        assertEquals(false, workToCheckDto.getIsPlanned());
+        assertNotEquals("PLANNED", workToCheckDto.getStatus());
         assertEquals(startDateString, workToCheckDto.getStartDate());
         assertEquals(endDateString, workToCheckDto.getEndDate());
 
@@ -181,19 +188,19 @@ public class WorkIntTest {
 
         // start before now with isPlanned = true
         WorkUpdateDto startForIsPlanned = new WorkUpdateDto(
-                null, null, null, true, null, null);
+                null, null, null, "PLANNED", null, null);
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.update(userId, workId, startForIsPlanned));
 
         // same Title and StartDate as another work
         NewWorkDto anotherWorkNewDto = new NewWorkDto("anotherTitle", null, vehicleFullDto1.getId(),
-                category1Id, false, startDateString, endDateString);
+                category1Id, null, startDateString, endDateString);
         WorkFullDto anotherWorkFullDto = workController.addWork(userId, anotherWorkNewDto);
         assertEquals(anotherWorkNewDto.getTitle(), anotherWorkFullDto.getTitle());
         assertEquals(anotherWorkNewDto.getStartDate(), anotherWorkFullDto.getStartDate());
 
         WorkUpdateDto sameTitleAndStartDto = new WorkUpdateDto(
-                anotherWorkFullDto.getTitle(), null, null, true, startDateString, null);
+                anotherWorkFullDto.getTitle(), null, null, "PLANNED", startDateString, null);
         assertThrows(ConflictOnRequestException.class,
                 () -> workController.update(userId, workId, sameTitleAndStartDto));
     }
@@ -250,7 +257,7 @@ public class WorkIntTest {
         assertEquals(addedWork3.getTitle(), listOfWorks.get(1).getTitle());
 
         // check wrong vehicle id
-        assertThrows(NotFoundException.class,
+        assertThrows(ConflictOnRequestException.class,
                 () -> workController.getByVehicleId(userId, 999L, "id", 0, 10));
     }
 
@@ -300,7 +307,7 @@ public class WorkIntTest {
 
         // by is_planned
         workList = workController.getByParams(userId, null, null, null,
-                true, null, null, "id", 0, 10);
+                "PLANNED", null, null, "id", 0, 10);
         assertEquals(2, workList.size());
         assertEquals(work1Id, workList.get(0).getId());
         assertEquals(work3Id, workList.get(1).getId());
@@ -320,7 +327,7 @@ public class WorkIntTest {
 
         // test sort by isPlanned
         workList = workController.getByParams(userId, null, null, null,
-                null, null, null, "is_Planned", 0, 10);
+                null, null, null, "status", 0, 10);
         assertEquals(4, workList.size());
         assertEquals(work2Id, workList.get(0).getId());
         assertEquals(work1Id, workList.get(1).getId());
@@ -330,7 +337,7 @@ public class WorkIntTest {
         // check error when start after end
         assertThrows(IncorrectRequestException.class, () ->
                 workController.getByParams(userId, null, null, null,
-                null, "02.01.2021", "01.01.2021", "id", 0, 10));
+                        null, "02.01.2021", "01.01.2021", "id", 0, 10));
     }
 
     @Test
@@ -350,5 +357,41 @@ public class WorkIntTest {
         // check wrong id
         assertThrows(NotFoundException.class,
                 () -> workController.removeById(userId, 999L));
+    }
+
+    /*
+        WorkPart service
+     */
+    @Test
+    void shouldAddPartToWorkAndGetByWorkId() {
+
+        Long userId = userFullDto.getId();
+        Long vehicle1Id = vehicleFullDto1.getId();
+
+        NewPartDto newPartDto1 = new NewPartDto(vehicle1Id, category1Id, "partNumber1", "partName1",
+                "descr1", true, null, "01.01.2020", "01.02.2020");
+
+        PartFullDto partFullDto1 = partController.addPart(userId, newPartDto1);
+        Long part1Id = partFullDto1.getId();
+
+        WorkFullDto addedWork1 = workController.addWork(userId, newWorkDto1);
+        Long work1Id = addedWork1.getId();
+
+        WorkFullDto addedWork2 = workController.addWork(userId, newWorkDto2);
+        Long work2Id = addedWork2.getId();
+
+        WorkFullDto addedWork3 = workController.addWork(userId, newWorkDto3);
+        Long work3Id = addedWork3.getId();
+
+        WorkFullDto addedWork4 = workController.addWork(userId, newWorkDto4);
+        Long work4Id = addedWork4.getId();
+
+        partController.addPartToWork(userId, part1Id, work1Id);
+        partController.addPartToWork(userId, part1Id, work2Id);
+        partController.addPartToWork(userId, part1Id, work3Id);
+        partController.addPartToWork(userId, part1Id, work4Id);
+
+        assertEquals(4,
+                workController.getByPartId(userId, part1Id, 0, 10).size());
     }
 }

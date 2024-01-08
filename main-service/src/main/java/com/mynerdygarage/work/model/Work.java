@@ -3,12 +3,12 @@ package com.mynerdygarage.work.model;
 import com.mynerdygarage.category.model.Category;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.vehicle.model.Vehicle;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -24,8 +24,8 @@ public class Work {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "initiator_id", nullable = false)
+    private User initiator;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
@@ -41,8 +41,8 @@ public class Work {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "is_planned")
-    private Boolean isPlanned;
+    @Column(name = "status")
+    private String status;
 
     @Column(name = "start_date")
     private LocalDate startDate;

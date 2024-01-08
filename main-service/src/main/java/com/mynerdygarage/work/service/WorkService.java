@@ -21,7 +21,7 @@ public interface WorkService {
                                   String text,
                                   Long[] vehicleIds,
                                   Long[] categoryIds,
-                                  Boolean isPlanned,
+                                  String status,
                                   String start,
                                   String end,
                                   String sortBy,

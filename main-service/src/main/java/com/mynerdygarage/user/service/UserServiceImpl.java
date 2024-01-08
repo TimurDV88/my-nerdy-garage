@@ -29,9 +29,9 @@ public class UserServiceImpl implements UserService {
 
         User user = UserCreator.create(newUserDto);
 
-        UserChecker.isCorrect(userRepository, UserMapper.userToFullDto(user));
+        UserChecker.isCorrect(userRepository, UserMapper.modelToFullDto(user));
 
-        UserFullDto fullDtoToReturn = UserMapper.userToFullDto(userRepository.save(user));
+        UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.save(user));
 
         log.info("-- User has been saved: {}", fullDtoToReturn);
 
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
         log.info("-- Getting user by userId={}", userId);
 
-        UserFullDto fullDtoToReturn = UserMapper.userToFullDto(userRepository.findById(userId).orElseThrow(() ->
+        UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("- UserId not found: " + userId)));
 
         log.info("-- User returned: {}", fullDtoToReturn);
@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         User userToCheck = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("- UserId not found: " + userId));
 
-        UserFullDto dtoToShowInLog = UserMapper.userToFullDto(userToCheck);
+        UserFullDto dtoToShowInLog = UserMapper.modelToFullDto(userToCheck);
 
         userRepository.deleteById(userId);
 

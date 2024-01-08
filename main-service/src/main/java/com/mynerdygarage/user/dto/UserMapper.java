@@ -9,7 +9,7 @@ import java.util.List;
 
 public class UserMapper {
 
-    public static UserFullDto userToFullDto(User user) {
+    public static UserFullDto modelToFullDto(User user) {
 
         return new UserFullDto(
                 user.getId(),
@@ -20,28 +20,28 @@ public class UserMapper {
         );
     }
 
-    public static List<UserFullDto> userToFullDto(Iterable<User> users) {
+    public static List<UserFullDto> modelToFullDto(Iterable<User> users) {
 
         List<UserFullDto> toReturn = new ArrayList<>();
 
         for (User user : users) {
-            toReturn.add(userToFullDto(user));
+            toReturn.add(modelToFullDto(user));
         }
 
         return toReturn;
     }
 
-    public static UserShortDto userToShortDto(User user) {
+    public static UserShortDto modelToShortDto(User user) {
 
-        return new UserShortDto(user.getId(), user.getName());
+        return user != null ? new UserShortDto(user.getId(), user.getName()) : null;
     }
 
-    public static List<UserShortDto> userToShortDto(Iterable<User> users) {
+    public static List<UserShortDto> modelToShortDto(Iterable<User> users) {
 
         List<UserShortDto> userShortDtoList = new ArrayList<>();
 
         for (User user : users) {
-            userShortDtoList.add(userToShortDto(user));
+            userShortDtoList.add(modelToShortDto(user));
         }
 
         return userShortDtoList;

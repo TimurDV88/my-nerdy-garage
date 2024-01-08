@@ -3,12 +3,12 @@ package com.mynerdygarage.category.controller;
 import com.mynerdygarage.category.dto.CategoryFullDto;
 import com.mynerdygarage.category.dto.NewCategoryDto;
 import com.mynerdygarage.category.service.CategoryService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @RestController

@@ -2,16 +2,18 @@ package com.mynerdygarage.work.service;
 
 import com.mynerdygarage.category.model.Category;
 import com.mynerdygarage.category.repository.CategoryRepository;
-import com.mynerdygarage.error.exception.IncorrectRequestException;
+import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.util.PageRequestCreator;
+import com.mynerdygarage.util.RequestParamsChecker;
 import com.mynerdygarage.vehicle.model.Vehicle;
 import com.mynerdygarage.vehicle.repository.VehicleRepository;
 import com.mynerdygarage.work.dto.*;
 import com.mynerdygarage.work.model.Work;
+import com.mynerdygarage.work.model.WorkStatus;
 import com.mynerdygarage.work.repository.WorkRepository;
 import com.mynerdygarage.work.service.util.*;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -23,7 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -55,7 +57,7 @@ public class WorkServiceImpl implements WorkService {
 
         WorkChecker.checkNewWork(workRepository, work);
 
-        WorkFullDto fullDtoToReturn = WorkMapper.workToFullDto(workRepository.save(work));
+        WorkFullDto fullDtoToReturn = WorkMapper.modelToFullDto(workRepository.save(work));
 
         log.info("-- Work has been saved: {}", fullDtoToReturn);
 
@@ -71,7 +73,7 @@ public class WorkServiceImpl implements WorkService {
         Work workToUpdate = workRepository.findById(workId).orElseThrow(() ->
                 new NotFoundException("- WorkId not found: " + workId));
 
-        if (!userId.equals(workToUpdate.getUser().getId())) {
+        if (!userId.equals(workToUpdate.getInitiator().getId())) {
             throw new NotFoundException("- User with Id=" + userId + " is not initiator of work with id=" + workId);
         }
 
@@ -85,11 +87,11 @@ public class WorkServiceImpl implements WorkService {
 
         Work inputWork = WorkCreator.createFromUpdateDto(category, inputDto);
 
-        WorkUpdater.update(workToUpdate, inputWork);
+        Work updatedWork = WorkUpdater.update(workToUpdate, inputWork);
 
-        WorkChecker.checkUpdateWork(workRepository, workToUpdate);
+        WorkChecker.checkUpdateWork(workRepository, updatedWork);
 
-        WorkFullDto fullDtoToReturn = WorkMapper.workToFullDto(workRepository.save(workToUpdate));
+        WorkFullDto fullDtoToReturn = WorkMapper.modelToFullDto(workRepository.save(updatedWork));
 
         log.info("-- Work has been updated: {}", fullDtoToReturn);
 
@@ -101,11 +103,12 @@ public class WorkServiceImpl implements WorkService {
 
         log.info("-- Returning work by workId={}", workId);
 
-        WorkFullDto fullDtoToReturn = WorkMapper.workToFullDto(workRepository.findById(workId).orElseThrow(() ->
+        WorkFullDto fullDtoToReturn = WorkMapper.modelToFullDto(workRepository.findById(workId).orElseThrow(() ->
                 new NotFoundException("- WorkId not found: " + workId)));
 
         if (!userId.equals(fullDtoToReturn.getUser().getId())) {
-            throw new NotFoundException("- User with Id=" + userId + " is not initiator of work with id=" + workId);
+            throw new ConflictOnRequestException(
+                    "- User with Id=" + userId + " is not initiator of work with id=" + workId);
         }
 
         log.info("-- Work returned: {}", fullDtoToReturn);
@@ -119,7 +122,8 @@ public class WorkServiceImpl implements WorkService {
         log.info("-- Returning works list by vehicleId={}", vehicleId);
 
         if (!vehicleRepository.existsByOwnerIdAndId(userId, vehicleId)) {
-            throw new NotFoundException("- User with id=" + userId + " does not own vehicle with id=" + vehicleId);
+            throw new ConflictOnRequestException(
+                    "- User with id=" + userId + " does not own vehicle with id=" + vehicleId);
         }
 
         Sort sort = WorkSorter.createSort(sortBy);
@@ -127,7 +131,7 @@ public class WorkServiceImpl implements WorkService {
 
         Iterable<Work> foundWorks = workRepository.findByVehicleId(vehicleId, pageRequest);
 
-        List<WorkShortDto> listToReturn = WorkMapper.workToShortDto(foundWorks);
+        List<WorkShortDto> listToReturn = WorkMapper.modelToShortDto(foundWorks);
 
         log.info("-- Work list for vehicleId={} returned, size={}", vehicleId, listToReturn.size());
 
@@ -139,58 +143,51 @@ public class WorkServiceImpl implements WorkService {
                                          String text,
                                          Long[] vehicleIds,
                                          Long[] categoryIds,
-                                         Boolean isPlanned,
+                                         String status,
                                          String start,
                                          String end,
                                          String sortBy, int from, int size) {
 
-        log.info("-- Returning works list by parameters: text={}, vehicleIds={}, categoryIds={}, isPlanned={}, " +
+        log.info("-- Returning works list by parameters: text={}, vehicleIds={}, categoryIds={}, status={}, " +
                         "startFromDate={}, endByDate={}, sort={}",
-                text, vehicleIds, categoryIds, isPlanned, start, end, sortBy);
+                text, vehicleIds, categoryIds, status, start, end, sortBy);
 
-        // checks:
+        // - checks:
+        RequestParamsChecker requestParamsChecker = new RequestParamsChecker(vehicleRepository, categoryRepository);
 
         // text
-        if (text != null && (text.isBlank() || text.length() < 2)) {
-            text = null;
-        }
+        text = requestParamsChecker.checkAndReturnText(text);
 
         // vehicleIds
-        if (vehicleIds != null) {
+        vehicleIds = requestParamsChecker.checkAndReturnVehicleIds(userId, vehicleIds);
 
-            List<Long> existedVehicleIds = vehicleRepository.findIdsByOwnerId(userId);
-            List<Long> properVehicleIds = new ArrayList<>();
+        // categoryIds
+        categoryIds = requestParamsChecker.checkAndReturnCategoryIds(userId, categoryIds);
 
-            for (Long inputVehicleId : vehicleIds) {
-                if (existedVehicleIds.contains(inputVehicleId)) {
-                    properVehicleIds.add(inputVehicleId);
-                }
-            }
+        // status
+        if (status != null &&
+                !Arrays.stream(WorkStatus.values()).map(Enum::name).toList().contains(status)) {
 
-            if (!properVehicleIds.isEmpty()) {
-                vehicleIds = properVehicleIds.toArray(new Long[0]);
-            } else {
-                vehicleIds = null;
-            }
+            throw new ConflictOnRequestException("- Incorrect work status");
         }
 
-        //start and end
+        // start and end
         LocalDate startDate = CustomFormatter.stringToDate(start);
         LocalDate endDate = CustomFormatter.stringToDate(end);
-        if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
-            throw new IncorrectRequestException("- start cannot be after end");
-        }
-        //end of checks
+        requestParamsChecker.checkStartAndEnd(startDate, endDate);
+
+        // - end of checks
 
         BooleanExpression byParameters =
                 WorkQueryCreator.createBooleanExpression(
-                        userId, text, vehicleIds, categoryIds, isPlanned, startDate, endDate);
+                        userId, text, vehicleIds, categoryIds, status, startDate, endDate);
+
         Sort sort = WorkSorter.createSort(sortBy);
         PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
 
         Iterable<Work> foundWorks = workRepository.findAll(byParameters, pageRequest);
 
-        List<WorkFullDto> listToReturn = WorkMapper.workToFullDto(foundWorks);
+        List<WorkFullDto> listToReturn = WorkMapper.modelToFullDto(foundWorks);
 
         log.info("-- Works list by parameters returned, size={}", listToReturn.size());
 
@@ -198,6 +195,7 @@ public class WorkServiceImpl implements WorkService {
     }
 
     @Override
+    @Transactional
     public void removeById(Long userId, Long workId) {
 
         log.info("--- Deleting work by workId={}", workId);

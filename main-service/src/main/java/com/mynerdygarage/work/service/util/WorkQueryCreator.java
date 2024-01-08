@@ -11,12 +11,12 @@ public class WorkQueryCreator {
                                                             String text,
                                                             Long[] vehicleIds,
                                                             Long[] categoryIds,
-                                                            Boolean isPlanned,
+                                                            String status,
                                                             LocalDate start,
                                                             LocalDate end) {
 
         //userId
-        BooleanExpression byUserId = QWork.work.user.id.eq(userId);
+        BooleanExpression byUserId = QWork.work.initiator.id.eq(userId);
 
         //text
         BooleanExpression byText = null;
@@ -37,10 +37,10 @@ public class WorkQueryCreator {
             byCategoryIds = QWork.work.category.id.in(categoryIds);
         }
 
-        //isPlanned
-        BooleanExpression byIsPlanned = null;
-        if (isPlanned != null) {
-            byIsPlanned = QWork.work.isPlanned.eq(isPlanned);
+        //status
+        BooleanExpression byStatus = null;
+        if (status != null) {
+            byStatus = QWork.work.status.eq(status);
         }
 
         //start
@@ -55,6 +55,6 @@ public class WorkQueryCreator {
             byEnd = QWork.work.endDate.loe(end);
         }
 
-        return byUserId.and(byText).and(byVehicleIds).and(byCategoryIds).and(byIsPlanned).and(byStart).and(byEnd);
+        return byUserId.and(byText).and(byVehicleIds).and(byCategoryIds).and(byStatus).and(byStart).and(byEnd);
     }
 }

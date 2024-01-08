@@ -1,9 +1,8 @@
 package com.mynerdygarage.vehicle.dto;
 
 import com.mynerdygarage.vehicle.model.FuelType;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
-
-import javax.validation.constraints.Size;
 
 @Data
 public class VehicleUpdateDto {

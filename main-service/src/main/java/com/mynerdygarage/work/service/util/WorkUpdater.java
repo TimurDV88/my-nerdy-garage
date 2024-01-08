@@ -10,7 +10,7 @@ public class WorkUpdater {
         NullChecker.setIfNotNull(workToUpdate::setTitle, inputWork.getTitle());
         NullChecker.setIfNotNull(workToUpdate::setDescription, inputWork.getDescription());
         NullChecker.setIfNotNull(workToUpdate::setCategory, inputWork.getCategory());
-        NullChecker.setIfNotNull(workToUpdate::setIsPlanned, inputWork.getIsPlanned());
+        NullChecker.setIfNotNull(workToUpdate::setStatus, inputWork.getStatus());
         NullChecker.setIfNotNull(workToUpdate::setStartDate, inputWork.getStartDate());
         NullChecker.setIfNotNull(workToUpdate::setEndDate, inputWork.getEndDate());
 

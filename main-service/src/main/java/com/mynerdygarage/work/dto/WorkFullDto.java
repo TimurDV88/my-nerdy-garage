@@ -20,7 +20,7 @@ public class WorkFullDto {
 
     private final String description;
 
-    private final Boolean isPlanned;
+    private final String status;
 
     private final String startDate;
 

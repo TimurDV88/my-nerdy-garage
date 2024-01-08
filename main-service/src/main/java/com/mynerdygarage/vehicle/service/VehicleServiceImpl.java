@@ -41,7 +41,7 @@ public class VehicleServiceImpl implements VehicleService {
 
         VehicleChecker.check(vehicleRepository, ownerId, vehicle);
 
-        VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicle));
+        VehicleFullDto fullDtoToReturn = VehicleMapper.modelToFullDto(vehicleRepository.save(vehicle));
 
         log.info("-- Vehicle has been saved: {}", fullDtoToReturn);
 
@@ -67,7 +67,7 @@ public class VehicleServiceImpl implements VehicleService {
 
         VehicleUpdater.update(vehicleToUpdate, inputVehicle);
 
-        VehicleFullDto fullDtoToReturn = VehicleMapper.vehicleToFullDto(vehicleRepository.save(vehicleToUpdate));
+        VehicleFullDto fullDtoToReturn = VehicleMapper.modelToFullDto(vehicleRepository.save(vehicleToUpdate));
 
         log.info("-- Vehicle has been updated: {}", fullDtoToReturn);
 
@@ -77,14 +77,14 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public VehicleFullDto getById(Long ownerId, Long vehicleId) {
 
-        log.info("-- Getting vehicle by vehicleId={}", vehicleId);
+        log.info("-- Returning vehicle by vehicleId={}", vehicleId);
 
         if (!userRepository.existsById(ownerId)) {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
         }
 
         VehicleFullDto fullDtoToReturn =
-                VehicleMapper.vehicleToFullDto(vehicleRepository.findById(vehicleId).orElseThrow(() ->
+                VehicleMapper.modelToFullDto(vehicleRepository.findById(vehicleId).orElseThrow(() ->
                         new NotFoundException("- VehicleId not found: " + vehicleId)));
 
         log.info("-- Vehicle returned: {}", fullDtoToReturn);
@@ -95,7 +95,7 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<VehicleShortDto> getByOwnerId(Long ownerId, int from, int size) {
 
-        log.info("-- Getting vehicles by ownerId={}", ownerId);
+        log.info("-- Returning vehicles by ownerId={}", ownerId);
 
         if (!userRepository.existsById(ownerId)) {
             throw new NotFoundException("- OwnerId not found: " + ownerId);
@@ -105,7 +105,7 @@ public class VehicleServiceImpl implements VehicleService {
         PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
 
         List<VehicleShortDto> listToReturn =
-                VehicleMapper.vehicleToShortDto(vehicleRepository.findByOwnerId(ownerId, pageRequest));
+                VehicleMapper.modelToShortDto(vehicleRepository.findByOwnerId(ownerId, pageRequest));
 
         log.info("-- Vehicle list for owner with id={} returned, size={}", ownerId, listToReturn.size());
 

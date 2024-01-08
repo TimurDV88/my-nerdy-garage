@@ -9,11 +9,11 @@ import java.util.List;
 
 public class VehicleMapper {
 
-    public static VehicleFullDto vehicleToFullDto(Vehicle vehicle) {
+    public static VehicleFullDto modelToFullDto(Vehicle vehicle) {
 
         return new VehicleFullDto(
                 vehicle.getId(),
-                UserMapper.userToShortDto(vehicle.getOwner()),
+                UserMapper.modelToShortDto(vehicle.getOwner()),
                 vehicle.getProducer(),
                 vehicle.getModel(),
                 vehicle.getName(),
@@ -27,33 +27,33 @@ public class VehicleMapper {
         );
     }
 
-    public static List<VehicleFullDto> vehicleToFullDto(Iterable<Vehicle> vehicles) {
+    public static List<VehicleFullDto> modelToFullDto(Iterable<Vehicle> vehicles) {
 
         List<VehicleFullDto> toReturn = new ArrayList<>();
 
         for (Vehicle vehicle : vehicles) {
-            toReturn.add(vehicleToFullDto(vehicle));
+            toReturn.add(modelToFullDto(vehicle));
         }
 
         return toReturn;
     }
 
-    public static VehicleShortDto vehicleToShortDto(Vehicle vehicle) {
+    public static VehicleShortDto modelToShortDto(Vehicle vehicle) {
 
         return new VehicleShortDto(
                 vehicle.getId(),
-                UserMapper.userToShortDto(vehicle.getOwner()),
+                UserMapper.modelToShortDto(vehicle.getOwner()),
                 vehicle.getName(),
                 CustomFormatter.dateToString(vehicle.getReleaseDate())
         );
     }
 
-    public static List<VehicleShortDto> vehicleToShortDto(Iterable<Vehicle> vehicles) {
+    public static List<VehicleShortDto> modelToShortDto(Iterable<Vehicle> vehicles) {
 
         List<VehicleShortDto> toReturn = new ArrayList<>();
 
         for (Vehicle vehicle : vehicles) {
-            toReturn.add(vehicleToShortDto(vehicle));
+            toReturn.add(modelToShortDto(vehicle));
         }
 
         return toReturn;

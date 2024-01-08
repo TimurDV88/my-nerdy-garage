@@ -1,19 +1,19 @@
 package com.mynerdygarage.int_test;
 
-import com.mynerdygarage.category.model.dafault.DefaultCategoriesHandler;
+import com.mynerdygarage.category.dafault.DefaultCategoriesHandler;
 import com.mynerdygarage.category.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ActiveProfiles("test-h2")
 @Transactional
-@SpringBootTest(
-        properties = "db.name=test",
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class DefaultCategoryLoaderTest {
 

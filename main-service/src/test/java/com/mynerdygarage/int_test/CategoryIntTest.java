@@ -13,16 +13,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test-h2")
 @Transactional
-@SpringBootTest(
-        properties = "db.name=test",
-        webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class CategoryIntTest {
 
@@ -105,8 +105,7 @@ public class CategoryIntTest {
         assertEquals("All about cabin works and parts", getResult.getDescription());
         assertNull(getResult.getCreator());
         CategoryFullDto getResult2 = actualDefaultCategories.get(2);
-        String expectedDescription = String.join("", "All about bodywork - washing, detailing, doors, ",
-                System.getProperty("sun.desktop"), " etc.");
+        String expectedDescription = "All about bodywork - washing, detailing, doors, windows etc.";
         assertEquals(expectedDescription, getResult2.getDescription());
         assertNull(getResult2.getCreator());
         CategoryFullDto getResult3 = actualDefaultCategories.get(4);
@@ -164,8 +163,8 @@ public class CategoryIntTest {
     @Test
     void shouldGetAvailableCategoriesByCreatorId() {
 
-        CategoryFullDto categoryFullDtoToCheck = categoryController.addCategory(creatorId, properNewCategoryDto);
-        Long categoryId = categoryFullDtoToCheck.getId();
+        CategoryFullDto customCategoryFullDtoToCheck = categoryController.addCategory(creatorId, properNewCategoryDto);
+        Long customCategoryId = customCategoryFullDtoToCheck.getId();
 
         List<CategoryFullDto> actualDefaultCategories = categoryController.getDefaultCategories(creatorId);
         CategoryFullDto firstDefaultCategory = actualDefaultCategories.get(0);
@@ -173,14 +172,11 @@ public class CategoryIntTest {
         List<CategoryFullDto> actualAvailableCategories = categoryController.getAvailableCategoriesByUserId(creatorId);
         int sizeOfAvailableList = actualAvailableCategories.size();
 
-        for (CategoryFullDto categoryFullDto : actualAvailableCategories) {
-            System.out.println(categoryFullDto);
-        }
+        assertEquals(10, actualAvailableCategories.size());
 
-        assertEquals(categoryController.getById(creatorId, categoryId),
+        assertEquals(categoryController.getById(creatorId, customCategoryId),
                 actualAvailableCategories.get(sizeOfAvailableList - 1));
 
-        assertEquals(firstDefaultCategory,
-                actualAvailableCategories.get(0));
+        assertEquals(firstDefaultCategory, actualAvailableCategories.get(0));
     }
 }

@@ -11,50 +11,50 @@ import java.util.List;
 
 public class WorkMapper {
 
-    public static WorkFullDto workToFullDto(Work work) {
+    public static WorkFullDto modelToFullDto(Work work) {
 
         return new WorkFullDto(
                 work.getId(),
-                UserMapper.userToShortDto(work.getUser()),
-                VehicleMapper.vehicleToShortDto(work.getVehicle()),
-                CategoryMapper.categoryToShortDto(work.getCategory()),
+                UserMapper.modelToShortDto(work.getInitiator()),
+                VehicleMapper.modelToShortDto(work.getVehicle()),
+                CategoryMapper.modelToShortDto(work.getCategory()),
                 work.getTitle(),
                 work.getDescription(),
-                work.getIsPlanned(),
+                work.getStatus(),
                 CustomFormatter.dateToString(work.getStartDate()),
                 CustomFormatter.dateToString(work.getEndDate())
         );
     }
 
-    public static List<WorkFullDto> workToFullDto(Iterable<Work> works) {
+    public static List<WorkFullDto> modelToFullDto(Iterable<Work> works) {
 
         List<WorkFullDto> listToReturn = new ArrayList<>();
 
         for (Work work : works) {
-            listToReturn.add(workToFullDto(work));
+            listToReturn.add(modelToFullDto(work));
         }
 
         return listToReturn;
     }
 
-    public static WorkShortDto workToShortDto(Work work) {
+    public static WorkShortDto modelToShortDto(Work work) {
 
         return new WorkShortDto(
                 work.getId(),
-                UserMapper.userToShortDto(work.getUser()),
-                VehicleMapper.vehicleToShortDto(work.getVehicle()),
-                CategoryMapper.categoryToShortDto(work.getCategory()),
+                UserMapper.modelToShortDto(work.getInitiator()),
+                VehicleMapper.modelToShortDto(work.getVehicle()),
+                CategoryMapper.modelToShortDto(work.getCategory()),
                 work.getTitle(),
                 work.getDescription()
         );
     }
 
-    public static List<WorkShortDto> workToShortDto(Iterable<Work> works) {
+    public static List<WorkShortDto> modelToShortDto(Iterable<Work> works) {
 
         List<WorkShortDto> listToReturn = new ArrayList<>();
 
         for (Work work : works) {
-            listToReturn.add(workToShortDto(work));
+            listToReturn.add(modelToShortDto(work));
         }
 
         return listToReturn;
