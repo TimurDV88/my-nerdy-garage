@@ -28,8 +28,6 @@ public class PartUpdateDto {
     @Size(max = 50, message = "size must be between 2 and 50")
     private final String status;
 
-    private final Boolean isPlanned;
-
     @Size(min = 12, message = "size must be between 12 and 13")
     @Size(max = 13, message = "size must be between 12 and 13")
     private final String orderDate;

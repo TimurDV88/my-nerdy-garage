@@ -74,7 +74,6 @@ public class PartController {
     /*
         WorkPart service
      */
-
     @PostMapping("/{partId}/work/{workId}")
     public void addPartToWork(@RequestHeader("X-Owner-User-Id") Long userId,
                               @PathVariable @NotNull Long partId,

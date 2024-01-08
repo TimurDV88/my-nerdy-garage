@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -55,7 +56,9 @@ public class WorkPartServiceImpl implements WorkPartService {
                     "- User with Id=" + userId + " is not initiator of work with id=" + work);
         }
 
-        WorkPartId workPartId = new WorkPartId(workId, partId);
+        WorkPartId workPartId = new WorkPartId();
+        workPartId.setWorkId(workId);
+        workPartId.setPartId(partId);
 
         if (workPartRepository.existsById(workPartId)) {
             throw new ConflictOnRequestException(String.format(
@@ -85,8 +88,7 @@ public class WorkPartServiceImpl implements WorkPartService {
                     "- User with Id=" + userId + " is not initiator of work with id=" + work);
         }
 
-        Sort sort = Sort.by("start_date").and(Sort.by("id"));
-        PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
+        PageRequest pageRequest = PageRequestCreator.create(from, size, Sort.unsorted());
 
         Iterable<WorkPart> foundWorkParts = workPartRepository.findByWorkPartIdWorkId(workId, pageRequest);
 
@@ -96,6 +98,8 @@ public class WorkPartServiceImpl implements WorkPartService {
 
             foundParts.add(PartMapper.modelToShortDto(workPart.getPart()));
         }
+
+        foundParts.sort(Comparator.comparing(PartShortDto::getName));
 
         log.info("-- List of parts by workId={} returned, size={}", workId, foundParts.size());
 
@@ -115,8 +119,7 @@ public class WorkPartServiceImpl implements WorkPartService {
                     "- User with Id=" + userId + " is not owner of part with id=" + part);
         }
 
-        Sort sort = Sort.by("name").and(Sort.by("id"));
-        PageRequest pageRequest = PageRequestCreator.create(from, size, sort);
+        PageRequest pageRequest = PageRequestCreator.create(from, size, Sort.unsorted());
 
         Iterable<WorkPart> foundWorkParts = workPartRepository.findByWorkPartIdPartId(partId, pageRequest);
 
@@ -126,6 +129,8 @@ public class WorkPartServiceImpl implements WorkPartService {
 
             foundWorks.add(WorkMapper.modelToShortDto(workPart.getWork()));
         }
+
+        foundWorks.sort(Comparator.comparing(WorkShortDto::getTitle));
 
         log.info("-- List of parts by partId={} returned, size={}", partId, foundWorks.size());
 
@@ -138,7 +143,9 @@ public class WorkPartServiceImpl implements WorkPartService {
 
         log.info("-- Removing part with partId={} from work with workId={}", partId, workId);
 
-        WorkPartId workPartId = new WorkPartId(workId, partId);
+        WorkPartId workPartId = new WorkPartId();
+        workPartId.setWorkId(workId);
+        workPartId.setPartId(partId);
         WorkPart workPartToRemove = workPartRepository.findById(workPartId).orElseThrow(() ->
                 new NotFoundException("- workPartId not found: " + workPartId));
 

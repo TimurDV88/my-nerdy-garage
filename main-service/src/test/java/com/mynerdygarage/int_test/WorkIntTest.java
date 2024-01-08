@@ -5,6 +5,9 @@ import com.mynerdygarage.category.dto.CategoryFullDto;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.IncorrectRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
+import com.mynerdygarage.parts.controller.PartController;
+import com.mynerdygarage.parts.dto.NewPartDto;
+import com.mynerdygarage.parts.dto.PartFullDto;
 import com.mynerdygarage.user.controller.UserController;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
@@ -39,6 +42,7 @@ public class WorkIntTest {
     private final VehicleController vehicleController;
     private final CategoryController categoryController;
     private final WorkController workController;
+    private final PartController partController;
 
     private VehicleFullDto vehicleFullDto1;
     private VehicleFullDto vehicleFullDto2;
@@ -353,5 +357,41 @@ public class WorkIntTest {
         // check wrong id
         assertThrows(NotFoundException.class,
                 () -> workController.removeById(userId, 999L));
+    }
+
+    /*
+        WorkPart service
+     */
+    @Test
+    void shouldAddPartToWorkAndGetByWorkId() {
+
+        Long userId = userFullDto.getId();
+        Long vehicle1Id = vehicleFullDto1.getId();
+
+        NewPartDto newPartDto1 = new NewPartDto(vehicle1Id, category1Id, "partNumber1", "partName1",
+                "descr1", true, null, "01.01.2020", "01.02.2020");
+
+        PartFullDto partFullDto1 = partController.addPart(userId, newPartDto1);
+        Long part1Id = partFullDto1.getId();
+
+        WorkFullDto addedWork1 = workController.addWork(userId, newWorkDto1);
+        Long work1Id = addedWork1.getId();
+
+        WorkFullDto addedWork2 = workController.addWork(userId, newWorkDto2);
+        Long work2Id = addedWork2.getId();
+
+        WorkFullDto addedWork3 = workController.addWork(userId, newWorkDto3);
+        Long work3Id = addedWork3.getId();
+
+        WorkFullDto addedWork4 = workController.addWork(userId, newWorkDto4);
+        Long work4Id = addedWork4.getId();
+
+        partController.addPartToWork(userId, part1Id, work1Id);
+        partController.addPartToWork(userId, part1Id, work2Id);
+        partController.addPartToWork(userId, part1Id, work3Id);
+        partController.addPartToWork(userId, part1Id, work4Id);
+
+        assertEquals(4,
+                workController.getByPartId(userId, part1Id, 0, 10).size());
     }
 }

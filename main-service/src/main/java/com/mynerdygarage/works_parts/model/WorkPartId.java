@@ -2,17 +2,21 @@ package com.mynerdygarage.works_parts.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
 @Embeddable
-@Data
+@Getter
+@Setter
+@ToString
 public class WorkPartId implements Serializable {
 
     @Column(name = "work_id")
-    private final Long workId;
+    private Long workId;
 
     @Column(name = "part_id")
-    private final Long partId;
+    private Long partId;
 }

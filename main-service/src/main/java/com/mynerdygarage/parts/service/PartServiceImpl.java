@@ -73,15 +73,20 @@ public class PartServiceImpl implements PartService {
 
         log.info("-- Updating part by partId={}: {}", partId, inputDto);
 
-        Vehicle vehicle = vehicleRepository.findById(inputDto.getVehicleId()).orElseThrow(() ->
-                new NotFoundException("- VehicleId not found: " + inputDto.getVehicleId()));
-
         Part partToUpdate = partRepository.findById(partId).orElseThrow(() ->
                 new NotFoundException("- partId not found: " + partId));
 
         if (!userId.equals(partToUpdate.getOwner().getId())) {
             throw new ConflictOnRequestException(
-                    "- User with Id=" + userId + " is not buyer of part with id=" + partId);
+                    "- User with Id=" + userId + " is not owner of part with id=" + partId);
+        }
+
+        Vehicle vehicle;
+        if (inputDto.getVehicleId() != null) {
+            vehicle = vehicleRepository.findById(inputDto.getVehicleId()).orElseThrow(() ->
+                    new NotFoundException("- VehicleId not found: " + inputDto.getVehicleId()));
+        } else {
+            vehicle = partToUpdate.getVehicle();
         }
 
         Category category;
@@ -175,7 +180,7 @@ public class PartServiceImpl implements PartService {
 
         List<PartFullDto> listToReturn = PartMapper.modelToFullDto(foundParts);
 
-        log.info("-- Works list by parameters returned, size={}", listToReturn.size());
+        log.info("-- Part list by parameters returned, size={}", listToReturn.size());
 
         return listToReturn;
     }
