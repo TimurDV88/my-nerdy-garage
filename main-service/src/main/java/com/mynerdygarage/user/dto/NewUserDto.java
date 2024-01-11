@@ -27,4 +27,13 @@ public class NewUserDto {
     @Size(min = 6, message = "size must be between 6 and 254")
     @Size(max = 254, message = "size must be between 6 and 254")
     private final String birthDate;
+
+    @NotNull
+    @NotBlank
+    @Size(min = 6, message = "size must be between 6 and 15")
+    @Size(max = 15, message = "size must be between 6 and 15")
+    private final String password;
+
+    @NotNull
+    private final String passwordConfirm;
 }

@@ -42,9 +42,11 @@ public class CategoryIntTest {
         NewUserDto properNewUserDto = new NewUserDto(
                 "ProperUserName",
                 "properUser@mail.com",
-                birthDateStr);
+                birthDateStr,
+                "password",
+                "password");
 
-        UserFullDto userFullDto = userController.add(properNewUserDto);
+        UserFullDto userFullDto = userController.registerNewUser(properNewUserDto);
         creatorId = userFullDto.getId();
 
         properNewCategoryDto = new NewCategoryDto("Custom category N1", "Descr for custom cat N1");

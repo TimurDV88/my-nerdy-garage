@@ -34,13 +34,15 @@ class UserIntTest {
         properNewUserDto = new NewUserDto(
                 "ProperUserName",
                 "properUser@mail.com",
-                birthDateStr);
+                birthDateStr,
+                "password",
+                "password");
     }
 
     @Test
     void shouldAddUser() {
 
-        UserFullDto dtoToCheck = userController.add(properNewUserDto);
+        UserFullDto dtoToCheck = userController.registerNewUser(properNewUserDto);
 
         assertEquals(properNewUserDto.getName(), dtoToCheck.getName());
         assertEquals(properNewUserDto.getEmail(), dtoToCheck.getEmail());
@@ -49,32 +51,40 @@ class UserIntTest {
         NewUserDto existedNameDto = new NewUserDto(
                 "ProperUserName",
                 "anotherUser@mail.com",
-                birthDateStr);
-        assertThrows(ConflictOnRequestException.class, () -> userController.add(existedNameDto));
+                birthDateStr,
+                "password",
+                "password");
+        assertThrows(ConflictOnRequestException.class, () -> userController.registerNewUser(existedNameDto));
 
         NewUserDto existedEmailDto = new NewUserDto(
                 "AnotherUserName",
                 "properUser@mail.com",
-                birthDateStr);
-        assertThrows(ConflictOnRequestException.class, () -> userController.add(existedEmailDto));
+                birthDateStr,
+                "password",
+                "password");
+        assertThrows(ConflictOnRequestException.class, () -> userController.registerNewUser(existedEmailDto));
 
         NewUserDto futureBirthDateDto = new NewUserDto(
                 "AnotherUserName",
                 "AnotherUser@mail.com",
-                "01.01.2050");
-        assertThrows(IncorrectRequestException.class, () -> userController.add(futureBirthDateDto));
+                "01.01.2050",
+                "password",
+                "password");
+        assertThrows(IncorrectRequestException.class, () -> userController.registerNewUser(futureBirthDateDto));
 
         NewUserDto wrongBirthDateDto = new NewUserDto(
                 "AnotherUserName",
                 "AnotherUser@mail.com",
-                "01-01-2000");
-        assertThrows(IncorrectRequestException.class, () -> userController.add(wrongBirthDateDto));
+                "01-01-2000",
+                "password",
+                "password");
+        assertThrows(IncorrectRequestException.class, () -> userController.registerNewUser(wrongBirthDateDto));
     }
 
     @Test
     void shouldUpdateUser() {
 
-        UserFullDto dtoToCheck = userController.add(properNewUserDto);
+        UserFullDto dtoToCheck = userController.registerNewUser(properNewUserDto);
 
         Long id = dtoToCheck.getId();
 
@@ -104,7 +114,7 @@ class UserIntTest {
     @Test
     void shouldGetUserById() {
 
-        UserFullDto dtoToCheck = userController.add(properNewUserDto);
+        UserFullDto dtoToCheck = userController.registerNewUser(properNewUserDto);
 
         Long id = dtoToCheck.getId();
 
@@ -114,7 +124,7 @@ class UserIntTest {
     @Test
     void shouldRemoveUserById() {
 
-        UserFullDto dtoToCheck = userController.add(properNewUserDto);
+        UserFullDto dtoToCheck = userController.registerNewUser(properNewUserDto);
 
         Long id = dtoToCheck.getId();
 

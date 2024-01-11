@@ -5,7 +5,7 @@ import com.mynerdygarage.work.dto.WorkFullDto;
 import com.mynerdygarage.work.dto.WorkShortDto;
 import com.mynerdygarage.work.dto.WorkUpdateDto;
 import com.mynerdygarage.work.service.WorkService;
-import com.mynerdygarage.works_parts.service.WorkPartService;
+import com.mynerdygarage.work_part.service.WorkPartService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;

@@ -44,7 +44,9 @@ public class VehicleIntTest {
         properNewUserDto = new NewUserDto(
                 "ProperUserName",
                 "properUser@mail.com",
-                birthDateStr);
+                birthDateStr,
+                "password",
+                "password");
 
         String releaseDateStr = "01.01.1920";
         properNewVehicleDto = new NewVehicleDto(
@@ -77,7 +79,7 @@ public class VehicleIntTest {
     @Test
     void shouldAddVehicle() {
 
-        UserFullDto userFullDto = userController.add(properNewUserDto);
+        UserFullDto userFullDto = userController.registerNewUser(properNewUserDto);
 
         Long ownerId = userFullDto.getId();
 
@@ -104,7 +106,7 @@ public class VehicleIntTest {
     @Test
     void shouldUpdateVehicle() {
 
-        UserFullDto userFullDto = userController.add(properNewUserDto);
+        UserFullDto userFullDto = userController.registerNewUser(properNewUserDto);
 
         Long ownerId = userFullDto.getId();
 
@@ -138,7 +140,7 @@ public class VehicleIntTest {
     @Test
     void shouldGetVehicleById() {
 
-        UserFullDto userFullDto = userController.add(properNewUserDto);
+        UserFullDto userFullDto = userController.registerNewUser(properNewUserDto);
 
         Long ownerId = userFullDto.getId();
 
@@ -152,7 +154,7 @@ public class VehicleIntTest {
     @Test
     void shouldGetVehiclesByOwnerId() {
 
-        UserFullDto userFullDto = userController.add(properNewUserDto);
+        UserFullDto userFullDto = userController.registerNewUser(properNewUserDto);
 
         Long ownerId = userFullDto.getId();
 
@@ -174,7 +176,7 @@ public class VehicleIntTest {
     @Test
     void shouldRemoveVehicleById() {
 
-        UserFullDto userFullDto = userController.add(properNewUserDto);
+        UserFullDto userFullDto = userController.registerNewUser(properNewUserDto);
 
         Long ownerId = userFullDto.getId();
 

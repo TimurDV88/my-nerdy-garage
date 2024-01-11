@@ -4,10 +4,10 @@ import com.mynerdygarage.category.controller.CategoryController;
 import com.mynerdygarage.category.dto.CategoryFullDto;
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
-import com.mynerdygarage.parts.controller.PartController;
-import com.mynerdygarage.parts.dto.NewPartDto;
-import com.mynerdygarage.parts.dto.PartFullDto;
-import com.mynerdygarage.parts.dto.PartUpdateDto;
+import com.mynerdygarage.part.controller.PartController;
+import com.mynerdygarage.part.dto.NewPartDto;
+import com.mynerdygarage.part.dto.PartFullDto;
+import com.mynerdygarage.part.dto.PartUpdateDto;
 import com.mynerdygarage.user.controller.UserController;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
@@ -67,8 +67,10 @@ public class PartIntTest {
         NewUserDto properNewUserDto = new NewUserDto(
                 "ProperUserName",
                 "properUser@mail.com",
-                birthDateStr);
-        userFullDto = userController.add(properNewUserDto);
+                birthDateStr,
+                "password",
+                "password");
+        userFullDto = userController.registerNewUser(properNewUserDto);
         userId = userFullDto.getId();
 
         String releaseDateStr = "01.01.1920";

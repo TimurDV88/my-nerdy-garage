@@ -1,7 +1,7 @@
 package com.mynerdygarage.work.service.util;
 
 import com.mynerdygarage.error.exception.ConflictOnRequestException;
-import com.mynerdygarage.parts.model.PartStatus;
+import com.mynerdygarage.part.model.PartStatus;
 import com.mynerdygarage.work.model.Work;
 import com.mynerdygarage.work.model.WorkStatus;
 import com.mynerdygarage.work.repository.WorkRepository;

@@ -1,5 +1,6 @@
 package com.mynerdygarage.user.service;
 
+import com.mynerdygarage.error.exception.ConflictOnRequestException;
 import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
@@ -11,6 +12,8 @@ import com.mynerdygarage.user.service.util.UserCreator;
 import com.mynerdygarage.user.service.util.UserUpdater;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
 
     @Override
@@ -27,9 +32,15 @@ public class UserServiceImpl implements UserService {
 
         log.info("-- Saving user: {}", newUserDto);
 
-        User user = UserCreator.create(newUserDto);
+        if (!newUserDto.getPassword().equals(newUserDto.getPasswordConfirm())) {
 
-        UserChecker.isCorrect(userRepository, UserMapper.modelToFullDto(user));
+            throw new ConflictOnRequestException(
+                    "- Password does not match to confirmation, user not saved");
+        }
+
+        User user = UserCreator.create(passwordEncoder, newUserDto);
+
+        UserChecker.check(userRepository, UserMapper.modelToFullDto(user));
 
         UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.save(user));
 
@@ -68,7 +79,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void removeById(Long userId) {
 
-        log.info("--- Deleting user by userId={}", userId);
+        log.info("-- Deleting user by userId={}", userId);
 
         User userToCheck = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("- UserId not found: " + userId));
@@ -77,6 +88,6 @@ public class UserServiceImpl implements UserService {
 
         userRepository.deleteById(userId);
 
-        log.info("--- User deleted: {}", dtoToShowInLog);
+        log.info("-- User deleted: {}", dtoToShowInLog);
     }
 }
