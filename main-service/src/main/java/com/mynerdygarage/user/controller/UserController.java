@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/admin/users")
+@RequestMapping(path = "/user")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserFullDto add(@RequestBody @Valid NewUserDto newUserDto) {
+    public UserFullDto registerNewUser(@RequestBody @Valid NewUserDto newUserDto) {
 
         return userService.addUser(newUserDto);
     }

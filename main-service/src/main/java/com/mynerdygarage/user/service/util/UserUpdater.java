@@ -12,7 +12,7 @@ public class UserUpdater {
 
     public static UserFullDto update(UserRepository userRepository, Long userId, UserFullDto inputFullUserDto) {
 
-        UserChecker.isCorrect(userRepository, inputFullUserDto);
+        UserChecker.check(userRepository, inputFullUserDto);
 
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException("- UserId not found: " + userId));

@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 public class UserChecker {
 
-    public static void isCorrect(UserRepository userRepository, UserFullDto userDto) {
+    public static void check(UserRepository userRepository, UserFullDto userDto) {
 
         if (userDto.getEmail() != null && userRepository.existsByEmail(userDto.getEmail())) {
             throw new ConflictOnRequestException("- User with this Email already exists: " + userDto.getEmail());

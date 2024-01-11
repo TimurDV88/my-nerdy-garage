@@ -1,4 +1,4 @@
-drop table IF EXISTS works_parts, parts, works, categories, vehicles, users CASCADE;
+-- drop table IF EXISTS works_parts, parts, works, categories, vehicles, users CASCADE;
 
 CREATE TABLE IF NOT EXISTS users (
 
@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
     email           VARCHAR(255) NOT NULL,
     birth_date      TIMESTAMP,
     reg_date        TIMESTAMP,
+    password        VARCHAR(255) NOT NULL,
 
     CONSTRAINT      pk_user PRIMARY KEY (id),
 
