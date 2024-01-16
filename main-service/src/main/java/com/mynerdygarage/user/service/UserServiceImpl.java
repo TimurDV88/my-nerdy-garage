@@ -5,6 +5,7 @@ import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
 import com.mynerdygarage.user.dto.UserMapper;
+import com.mynerdygarage.user.dto.UserUpdateDto;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.user.service.util.UserChecker;
@@ -38,9 +39,9 @@ public class UserServiceImpl implements UserService {
                     "- Password does not match to confirmation, user not saved");
         }
 
-        User user = UserCreator.create(passwordEncoder, newUserDto);
+        User user = UserCreator.createFromNewUserDto(passwordEncoder, newUserDto);
 
-        UserChecker.check(userRepository, UserMapper.modelToFullDto(user));
+        UserChecker.checkNewUser(userRepository, user);
 
         UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.save(user));
 
@@ -51,11 +52,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserFullDto update(Long userId, UserFullDto inputFullUserDto) {
+    public UserFullDto update(Long userId, UserUpdateDto userUpdateDto) {
 
-        log.info("-- Updating user by userId={}: {}", userId, inputFullUserDto);
+        log.info("-- Updating user by userId={}: {}", userId, userUpdateDto);
 
-        UserFullDto fullDtoToReturn = UserUpdater.update(userRepository, userId, inputFullUserDto);
+        User userToUpdate = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException("- UserId not found: " + userId));
+
+        User userToCheck = UserCreator.createFromUserUpdateDto(userUpdateDto);
+
+        UserChecker.checkUserUpdate(userRepository, userToCheck);
+
+        User updatedUser = UserUpdater.update(userToUpdate, userUpdateDto);
+
+        UserFullDto fullDtoToReturn = UserMapper.modelToFullDto(userRepository.save(updatedUser));
 
         log.info("-- User has been updated: {}", fullDtoToReturn);
 

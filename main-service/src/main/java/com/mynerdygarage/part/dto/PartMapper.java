@@ -6,8 +6,8 @@ import com.mynerdygarage.user.dto.UserMapper;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.vehicle.dto.VehicleMapper;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 public class PartMapper {
 
@@ -31,13 +31,9 @@ public class PartMapper {
 
     public static List<PartFullDto> modelToFullDto(Iterable<Part> parts) {
 
-        List<PartFullDto> listToReturn = new ArrayList<>();
-
-        for (Part part : parts) {
-            listToReturn.add(modelToFullDto(part));
-        }
-
-        return listToReturn;
+        return StreamSupport.stream(parts.spliterator(), false)
+                .map(PartMapper::modelToFullDto)
+                .toList();
     }
 
     public static PartShortDto modelToShortDto(Part part) {
@@ -52,12 +48,8 @@ public class PartMapper {
 
     public static List<PartShortDto> modelToShortDto(Iterable<Part> parts) {
 
-        List<PartShortDto> listToReturn = new ArrayList<>();
-
-        for (Part part : parts) {
-            listToReturn.add(modelToShortDto(part));
-        }
-
-        return listToReturn;
+        return StreamSupport.stream(parts.spliterator(), false)
+                .map(PartMapper::modelToShortDto)
+                .toList();
     }
 }

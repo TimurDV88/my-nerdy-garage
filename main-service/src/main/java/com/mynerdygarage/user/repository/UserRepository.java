@@ -12,13 +12,15 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsById(Long id);
 
-    boolean existsByEmail(String email);
+    boolean existsByNameIgnoreCaseOrEmailIgnoreCase(String name, String email);
 
-    boolean existsByName(String name);
-
-    @Query("SELECT u " +
-            "FROM User as u " +
-            "WHERE u.name = :name " +
-            "OR u.email = :email")
+    @Query("""
+            SELECT u
+            FROM User as u
+            WHERE u.name = :name
+            OR u.email = :email
+            ORDER BY u.id
+            LIMIT 1
+            """)
     Optional<User> findByNameOrEmail(String name, String email);
 }

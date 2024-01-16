@@ -105,7 +105,7 @@ public class PartServiceImpl implements PartService {
 
         PartFullDto fullDtoToReturn = PartMapper.modelToFullDto(partRepository.save(updatedPart));
 
-        log.info("-- Work has been updated: {}", fullDtoToReturn);
+        log.info("-- Part has been updated: {}", fullDtoToReturn);
 
         return fullDtoToReturn;
     }

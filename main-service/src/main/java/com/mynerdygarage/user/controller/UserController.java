@@ -2,6 +2,7 @@ package com.mynerdygarage.user.controller;
 
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
+import com.mynerdygarage.user.dto.UserUpdateDto;
 import com.mynerdygarage.user.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -25,9 +26,9 @@ public class UserController {
 
     @PatchMapping("/{userId}")
     public UserFullDto update(@PathVariable @NotNull Long userId,
-                              @RequestBody @Valid UserFullDto userFullDto) {
+                              @RequestBody @Valid UserUpdateDto userUpdateDto) {
 
-        return userService.update(userId, userFullDto);
+        return userService.update(userId, userUpdateDto);
     }
 
     @GetMapping("/{userId}")

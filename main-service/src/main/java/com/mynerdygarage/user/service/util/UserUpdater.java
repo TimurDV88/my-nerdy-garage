@@ -1,26 +1,18 @@
 package com.mynerdygarage.user.service.util;
 
-import com.mynerdygarage.error.exception.NotFoundException;
-import com.mynerdygarage.user.dto.UserFullDto;
-import com.mynerdygarage.user.dto.UserMapper;
+import com.mynerdygarage.user.dto.UserUpdateDto;
 import com.mynerdygarage.user.model.User;
-import com.mynerdygarage.user.repository.UserRepository;
 import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.util.NullChecker;
 
 public class UserUpdater {
 
-    public static UserFullDto update(UserRepository userRepository, Long userId, UserFullDto inputFullUserDto) {
+    public static User update(User user, UserUpdateDto userUpdateDto) {
 
-        UserChecker.check(userRepository, inputFullUserDto);
+        NullChecker.setIfNotNull(user::setName, userUpdateDto.getName());
+        NullChecker.setIfNotNull(user::setEmail, userUpdateDto.getEmail());
+        NullChecker.setIfNotNull(user::setBirthDate, CustomFormatter.stringToDate(userUpdateDto.getBirthDate()));
 
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException("- UserId not found: " + userId));
-
-        NullChecker.setIfNotNull(user::setName, inputFullUserDto.getName());
-        NullChecker.setIfNotNull(user::setEmail, inputFullUserDto.getEmail());
-        NullChecker.setIfNotNull(user::setBirthDate, CustomFormatter.stringToDate(inputFullUserDto.getBirthDate()));
-
-        return UserMapper.modelToFullDto(userRepository.save(user));
+        return user;
     }
 }
