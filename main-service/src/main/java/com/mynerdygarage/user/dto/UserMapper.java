@@ -4,8 +4,8 @@ package com.mynerdygarage.user.dto;
 import com.mynerdygarage.user.model.User;
 import com.mynerdygarage.util.CustomFormatter;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 public class UserMapper {
 
@@ -22,13 +22,9 @@ public class UserMapper {
 
     public static List<UserFullDto> modelToFullDto(Iterable<User> users) {
 
-        List<UserFullDto> toReturn = new ArrayList<>();
-
-        for (User user : users) {
-            toReturn.add(modelToFullDto(user));
-        }
-
-        return toReturn;
+        return StreamSupport.stream(users.spliterator(), false)
+                .map(UserMapper::modelToFullDto)
+                .toList();
     }
 
     public static UserShortDto modelToShortDto(User user) {
@@ -38,12 +34,8 @@ public class UserMapper {
 
     public static List<UserShortDto> modelToShortDto(Iterable<User> users) {
 
-        List<UserShortDto> userShortDtoList = new ArrayList<>();
-
-        for (User user : users) {
-            userShortDtoList.add(modelToShortDto(user));
-        }
-
-        return userShortDtoList;
+        return StreamSupport.stream(users.spliterator(), false)
+                .map(UserMapper::modelToShortDto)
+                .toList();
     }
 }

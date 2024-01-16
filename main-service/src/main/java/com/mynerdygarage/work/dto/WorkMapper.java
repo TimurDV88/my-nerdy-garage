@@ -6,8 +6,8 @@ import com.mynerdygarage.util.CustomFormatter;
 import com.mynerdygarage.vehicle.dto.VehicleMapper;
 import com.mynerdygarage.work.model.Work;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 public class WorkMapper {
 
@@ -28,13 +28,9 @@ public class WorkMapper {
 
     public static List<WorkFullDto> modelToFullDto(Iterable<Work> works) {
 
-        List<WorkFullDto> listToReturn = new ArrayList<>();
-
-        for (Work work : works) {
-            listToReturn.add(modelToFullDto(work));
-        }
-
-        return listToReturn;
+        return StreamSupport.stream(works.spliterator(), false)
+                .map(WorkMapper::modelToFullDto)
+                .toList();
     }
 
     public static WorkShortDto modelToShortDto(Work work) {
@@ -51,12 +47,8 @@ public class WorkMapper {
 
     public static List<WorkShortDto> modelToShortDto(Iterable<Work> works) {
 
-        List<WorkShortDto> listToReturn = new ArrayList<>();
-
-        for (Work work : works) {
-            listToReturn.add(modelToShortDto(work));
-        }
-
-        return listToReturn;
+        return StreamSupport.stream(works.spliterator(), false)
+                .map(WorkMapper::modelToShortDto)
+                .toList();
     }
 }

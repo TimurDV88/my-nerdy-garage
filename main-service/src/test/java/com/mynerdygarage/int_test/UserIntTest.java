@@ -6,6 +6,7 @@ import com.mynerdygarage.error.exception.NotFoundException;
 import com.mynerdygarage.user.controller.UserController;
 import com.mynerdygarage.user.dto.NewUserDto;
 import com.mynerdygarage.user.dto.UserFullDto;
+import com.mynerdygarage.user.dto.UserUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ActiveProfiles("test-h2")
+@ActiveProfiles("test-postgres")
 @Transactional
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -84,31 +85,44 @@ class UserIntTest {
     @Test
     void shouldUpdateUser() {
 
-        UserFullDto dtoToCheck = userController.registerNewUser(properNewUserDto);
+        UserFullDto firstUserDto = userController.registerNewUser(properNewUserDto);
+        Long user1Id = firstUserDto.getId();
 
-        Long id = dtoToCheck.getId();
+        NewUserDto secondNewUserDto = new NewUserDto(
+                "anotherProperUserName",
+                "anotherProperUser@mail.com",
+                birthDateStr,
+                "password",
+                "password");
 
+        UserFullDto secondUserDto = userController.registerNewUser(secondNewUserDto);
+        Long user2Id = secondUserDto.getId();
+
+        // updating name for user 1
         String newName = "newName";
-        UserFullDto updatedNameDto = new UserFullDto(null, newName, null, null, null);
-        updatedNameDto = userController.update(id, updatedNameDto);
+        UserUpdateDto updatedNameNewDto = new UserUpdateDto(newName, null, null);
+        UserFullDto updatedNameFullDto = userController.update(user1Id, updatedNameNewDto);
 
-        assertEquals(newName, updatedNameDto.getName());
-        assertEquals(properNewUserDto.getEmail(), updatedNameDto.getEmail());
-        assertEquals(properNewUserDto.getBirthDate(), updatedNameDto.getBirthDate());
+        assertEquals(newName, updatedNameFullDto.getName());
+        assertEquals(properNewUserDto.getEmail(), updatedNameFullDto.getEmail());
+        assertEquals(properNewUserDto.getBirthDate(), updatedNameFullDto.getBirthDate());
 
-        UserFullDto sameNameDto = new UserFullDto(null, newName, null, null, null);
-        assertThrows(ConflictOnRequestException.class, () -> userController.update(id, sameNameDto));
+        // error to update name for user 2 to same as user 1
+        UserUpdateDto sameNameDto = new UserUpdateDto(newName, null, null);
+        assertThrows(ConflictOnRequestException.class, () -> userController.update(user2Id, sameNameDto));
 
-        String newEmail = "newEmail";
-        UserFullDto updatedEmailDto = new UserFullDto(null, null, newEmail, null, null);
-        updatedEmailDto = userController.update(id, updatedEmailDto);
+        // updating email for user 1
+        String newEmail = "newEmail@mail.com";
+        UserUpdateDto updatedEmailNewDto = new UserUpdateDto(null, newEmail, null);
+        UserFullDto updatedEmailDto = userController.update(user1Id, updatedEmailNewDto);
 
-        assertEquals(properNewUserDto.getName(), dtoToCheck.getName());
+        assertEquals(properNewUserDto.getName(), firstUserDto.getName());
         assertEquals(newEmail, updatedEmailDto.getEmail());
-        assertEquals(properNewUserDto.getBirthDate(), dtoToCheck.getBirthDate());
+        assertEquals(properNewUserDto.getBirthDate(), firstUserDto.getBirthDate());
 
-        UserFullDto sameEmailDto = new UserFullDto(null, null, newEmail, null, null);
-        assertThrows(ConflictOnRequestException.class, () -> userController.update(id, sameEmailDto));
+        // error to update email for user 2 to same as user 1
+        UserUpdateDto sameEmailDto = new UserUpdateDto(null, newEmail, null);
+        assertThrows(ConflictOnRequestException.class, () -> userController.update(user2Id, sameEmailDto));
     }
 
     @Test

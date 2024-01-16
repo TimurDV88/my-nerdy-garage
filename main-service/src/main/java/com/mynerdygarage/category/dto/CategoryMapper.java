@@ -3,8 +3,8 @@ package com.mynerdygarage.category.dto;
 import com.mynerdygarage.category.model.Category;
 import com.mynerdygarage.user.dto.UserMapper;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.StreamSupport;
 
 public class CategoryMapper {
 
@@ -20,13 +20,9 @@ public class CategoryMapper {
 
     public static List<CategoryFullDto> modelToFullDto(Iterable<Category> categories) {
 
-        List<CategoryFullDto> toReturn = new ArrayList<>();
-
-        for (Category category : categories) {
-            toReturn.add(modelToFullDto(category));
-        }
-
-        return toReturn;
+        return StreamSupport.stream(categories.spliterator(), false)
+                .map(CategoryMapper::modelToFullDto)
+                .toList();
     }
 
     public static CategoryShortDto modelToShortDto(Category category) {
@@ -36,12 +32,8 @@ public class CategoryMapper {
 
     public static List<CategoryShortDto> modelToShortDto(Iterable<Category> categories) {
 
-        List<CategoryShortDto> toReturn = new ArrayList<>();
-
-        for (Category category : categories) {
-            toReturn.add(modelToShortDto(category));
-        }
-
-        return toReturn;
+        return StreamSupport.stream(categories.spliterator(), false)
+                .map(CategoryMapper::modelToShortDto)
+                .toList();
     }
 }
