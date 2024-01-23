@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+
+  server:
+    build: ./main-service
+    container_name: mnw_main_service_container
+    ports:
+      - "9090:8080"
+    environment:
+      - DB_DRIVER=org.postgresql.Driver
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://rc1a-1oek31dasb80vjcq.mdb.yandexcloud.net:6432/my-test-db?targetServerType=master&ssl=true&sslmode=verify-full
+      - DB_USER=user1
+      - DB_PASSWORD=pizda666
+
